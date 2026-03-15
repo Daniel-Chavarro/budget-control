@@ -35,15 +35,64 @@ A budget control system for apartment building administration where tenants uplo
 ### Approach
 Monolithic Django with traditional server-side rendering, enhanced with HTMX for interactive receipt upload/preview.
 
-### Django Apps Structure
+### Django App Structure (Single App)
 
 ```
 budget-control/
-├── core/                 # Project settings, URLs
-├── accounts/             # User auth, profiles, user-unit relationships
-├── units/                # Apartment and parking slot management
-├── receipts/             # Receipt upload, OCR processing, expense data
-└── dashboard/            # Role-based dashboards and reporting
+├── core/                     # Project settings (existing)
+│   ├── settings/
+│   │   ├── base.py           # Common settings
+│   │   ├── development.py    # Dev overrides
+│   │   └── production.py     # Production settings
+│   └── urls.py               # Root URL configuration
+│
+└── budget/                   # Single app (python manage.py startapp budget)
+    ├── models/
+    │   ├── __init__.py       # Import all models here
+    │   ├── user.py           # UserProfile model
+    │   ├── unit.py           # Unit, UserUnit models
+    │   └── receipt.py        # Receipt, ExpenseData models
+    │
+    ├── views/
+    │   ├── __init__.py
+    │   ├── auth.py           # Login, logout, registration
+    │   ├── dashboard.py      # Role-based dashboards
+    │   ├── receipts.py       # Upload, list, detail views
+    │   ├── review.py         # Admin review workflow
+    │   └── management.py     # User/unit management (admin)
+    │
+    ├── services/
+    │   ├── __init__.py
+    │   ├── ocr_service.py    # OCR abstraction layer
+    │   └── storage_service.py # Storage abstraction layer
+    │
+    ├── forms/
+    │   ├── __init__.py
+    │   ├── auth_forms.py     # Login, registration forms
+    │   ├── receipt_forms.py  # Upload, expense data forms
+    │   └── management_forms.py # User/unit forms
+    │
+    ├── templates/
+    │   └── budget/
+    │       ├── base.html     # Base layout
+    │       ├── auth/         # Login, register templates
+    │       ├── dashboard/    # Dashboard templates
+    │       ├── receipts/     # Receipt upload/list templates
+    │       ├── review/       # Admin review templates
+    │       └── management/   # User/unit management templates
+    │
+    ├── static/
+    │   └── budget/
+    │       ├── css/
+    │       └── js/
+    │
+    ├── templatetags/         # Custom template tags if needed
+    ├── admin.py              # Django admin customization
+    ├── urls.py               # App URL patterns
+    └── tests/
+        ├── test_models.py
+        ├── test_views.py
+        └── test_services.py
 ```
 
 ### Key Technologies
@@ -171,7 +220,7 @@ class ExpenseData(models.Model):
 
 ### OCR Service Layer
 ```python
-# receipts/services/ocr_service.py
+# budget/services/ocr_service.py
 
 class BaseOCRService:
     def extract_receipt_data(self, image_file) -> dict:
@@ -197,7 +246,7 @@ def get_ocr_service() -> BaseOCRService:
 
 ### Storage Service Layer
 ```python
-# receipts/services/storage_service.py
+# budget/services/storage_service.py
 
 class BaseStorageService:
     def upload_file(self, file, filename) -> str:
