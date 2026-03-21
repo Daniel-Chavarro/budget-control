@@ -281,18 +281,18 @@ def get_storage_service() -> BaseStorageService:
 
 ### Authorization Rules
 
-| Action | Admin | Tenant | Unlinked User |
-|--------|-------|--------|---------------|
-| View all receipts | Yes | No | No |
-| Approve/reject receipts | Yes | No | No |
-| Edit any expense data | Yes | No | No |
-| Upload as any user | Yes | No | No |
-| Manage users/units | Yes | No | No |
-| View detailed reports | Yes | No | No |
-| Upload own receipts | Yes | Yes | Yes |
-| Edit own pending receipts | Yes | Yes | Yes |
-| View approved expenses | Yes | Summary + List | Summary + List |
-| View own submissions | Yes | Yes | Yes |
+| Action | Admin | Tenant                | Unlinked User |
+|--------|-------|-----------------------|---------------|
+| View all receipts | Yes | Not sure, possibly yes | No |
+| Approve/reject receipts | Yes | No                    | No |
+| Edit any expense data | Yes | No                    | No |
+| Upload as any user | Yes | No                    | No |
+| Manage users/units | Yes | No                    | No |
+| View detailed reports | Yes | No                    | No |
+| Upload own receipts | Yes | Yes                   | Yes |
+| Edit own pending receipts | Yes | Yes                   | Yes |
+| View approved expenses | Yes | Summary + List        | Summary + List |
+| View own submissions | Yes | Yes                   | Yes |
 
 ### File Security
 - Google Drive files stored in service account folder (not public)
