@@ -211,3 +211,4 @@ __marimo__/
 .agent/
 .claude/
 skills-lock.json
+/secrets/
