@@ -87,3 +87,13 @@ class TestProjectSetup(TestCase):
     def test_django_environment(self):
         """Test that Django test environment is configured."""
         assert True
+
+
+def test_userprofile_admin_display():
+    """Test UserProfile displays correctly in admin."""
+    from django.contrib import admin
+    from budget.admin import UserProfileAdmin
+    from budget.models import UserProfile
+    
+    # Check UserProfile is registered
+    assert UserProfile in admin.site._registry
