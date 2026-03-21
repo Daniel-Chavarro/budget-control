@@ -19,14 +19,14 @@
 - Create: `core/settings/production.py`
 - Modify: `core/settings.py` (will be deleted after split)
 
-- [ ] **Step 1: Create settings directory structure**
+- [x] **Step 1: Create settings directory structure**
 
 ```bash
 mkdir core/settings
 touch core/settings/__init__.py
 ```
 
-- [ ] **Step 2: Move base settings to base.py**
+- [x] **Step 2: Move base settings to base.py**
 
 Create `core/settings/base.py` with common settings (from current settings.py):
 
@@ -117,7 +117,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ```
 
-- [ ] **Step 3: Create development settings**
+- [x] **Step 3: Create development settings**
 
 Create `core/settings/development.py`:
 
@@ -145,7 +145,7 @@ INSTALLED_APPS += [
 ]
 ```
 
-- [ ] **Step 4: Create production settings**
+- [x] **Step 4: Create production settings**
 
 Create `core/settings/production.py`:
 
@@ -181,7 +181,7 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 ```
 
-- [ ] **Step 5: Update settings/__init__.py to auto-load environment**
+- [x] **Step 5: Update settings/__init__.py to auto-load environment**
 
 Create `core/settings/__init__.py`:
 
@@ -199,13 +199,13 @@ else:
     from .development import *
 ```
 
-- [ ] **Step 6: Delete old settings.py file**
+- [x] **Step 6: Delete old settings.py file**
 
 ```bash
 rm core/settings.py
 ```
 
-- [ ] **Step 7: Test settings import**
+- [x] **Step 7: Test settings import**
 
 ```bash
 python manage.py check
@@ -213,7 +213,7 @@ python manage.py check
 
 Expected: No errors, system check passes
 
-- [ ] **Step 8: Commit settings reorganization**
+- [x] **Step 8: Commit settings reorganization**
 
 ```bash
 git add core/settings/
