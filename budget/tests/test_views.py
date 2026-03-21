@@ -47,3 +47,42 @@ class TestRegistrationView(TestCase):
         
         assert response.status_code == 200
         assert not User.objects.filter(username='newuser').exists()
+
+
+class TestLoginView(TestCase):
+    """Test user login."""
+    
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123'
+        )
+    
+    def test_login_page_loads(self):
+        """Test login page is accessible."""
+        response = self.client.get(reverse('budget:login'))
+        assert response.status_code == 200
+        assert b'Login' in response.content
+    
+    def test_login_success(self):
+        """Test successful login."""
+        data = {
+            'username': 'testuser',
+            'password': 'testpass123',
+        }
+        response = self.client.post(reverse('budget:login'), data)
+        
+        assert response.status_code == 302
+        assert response.url == reverse('budget:dashboard')
+    
+    def test_login_invalid_credentials(self):
+        """Test login fails with invalid credentials."""
+        data = {
+            'username': 'testuser',
+            'password': 'wrongpass',
+        }
+        response = self.client.post(reverse('budget:login'), data)
+        
+        assert response.status_code == 200
+        assert b'Login' in response.content
