@@ -1,0 +1,2 @@
+# Development requirements by default
+-r requirements/development.txt
