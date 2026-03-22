@@ -1,0 +1,152 @@
+{% extends "budget/base.html" %}
+
+{% block title %}Admin Dashboard - Budget Control{% endblock %}
+
+{% block content %}
+<h2>Admin Dashboard</h2>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h6>Pending Review</h6>
+                <h3>{{ pending_count }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h6>Approved</h6>
+                <h3>{{ approved_count }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <h6>Rejected</h6>
+                <h3>{{ rejected_count }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h6>Total Users</h6>
+                <h3>{{ total_users }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5>This Month Total Expenses</h5>
+                <h2>${{ month_expenses|floatformat:2 }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pending Receipts -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between">
+        <h5>Pending Receipts</h5>
+        <a href="{% url 'budget:pending_receipts' %}" class="btn btn-sm btn-warning">View All</a>
+    </div>
+    <div class="card-body">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Upload Date</th>
+                    <th>File</th>
+                    <th>Uploader</th>
+                    <th>Vendor</th>
+                    <th>Amount</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for receipt in pending_receipts %}
+                <tr>
+                    <td>{{ receipt.upload_timestamp|date:"Y-m-d H:i" }}</td>
+                    <td>{{ receipt.file_name }}</td>
+                    <td>{{ receipt.uploaded_by.username }}</td>
+                    <td>{{ receipt.expense_data.vendor|default:'-' }}</td>
+                    <td>${{ receipt.expense_data.amount|default:'-' }}</td>
+                    <td>
+                        <a href="{% url 'budget:receipt_detail' receipt.pk %}" class="btn btn-sm btn-primary">Review</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6">No pending receipts.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Category Breakdown -->
+<div class="card mb-4">
+    <div class="card-header"><h5>Expenses by Category</h5></div>
+    <div class="card-body">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Count</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cat in category_breakdown %}
+                <tr>
+                    <td>{{ cat.category|title }}</td>
+                    <td>{{ cat.count }}</td>
+                    <td>${{ cat.total|floatformat:2 }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3">No expense data.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="card">
+    <div class="card-header"><h5>Recent Receipt Activity</h5></div>
+    <div class="card-body">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>File</th>
+                    <th>Uploader</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for receipt in recent_receipts %}
+                <tr>
+                    <td>{{ receipt.upload_timestamp|date:"Y-m-d H:i" }}</td>
+                    <td>{{ receipt.file_name }}</td>
+                    <td>{{ receipt.uploaded_by.username }}</td>
+                    <td>
+                        <span class="badge bg-{% if receipt.is_approved %}success{% elif receipt.is_rejected %}danger{% else %}warning{% endif %}">
+                            {{ receipt.get_status_display }}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4">No receipts yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
