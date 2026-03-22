@@ -93,3 +93,8 @@ LOGOUT_REDIRECT_URL = '/login/'
 STORAGE_PROVIDER = os.environ.get('STORAGE_PROVIDER', 'google_drive')
 GOOGLE_DRIVE_CREDENTIALS_FILE = os.environ.get('GOOGLE_DRIVE_CREDENTIALS_FILE', '')
 CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL', '')
+
+# OCR service configuration
+OCR_PROVIDER = os.environ.get('OCR_PROVIDER', 'gemini')
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
+OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY', '')
