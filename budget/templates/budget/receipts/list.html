@@ -1,41 +1,67 @@
 {% extends "budget/base.html" %}
 
-{% block title %}My Receipts{% endblock %}
+{% block title %}My Receipts - Budget Control{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between mb-4">
-    <h2>My Receipts</h2>
-    <a href="{% url 'budget:receipt_upload' %}" class="btn btn-primary">Upload Receipt</a>
+<div class="page-header d-flex justify-content-between align-items-start">
+    <div>
+        <h1 class="page-title"><i class="bi bi-receipt me-2"></i>My Receipts</h1>
+        <p class="page-subtitle">View and manage your uploaded receipts</p>
+    </div>
+    <a href="{% url 'budget:receipt_upload' %}" class="btn btn-primary">
+        <i class="bi bi-upload me-1"></i>Upload Receipt
+    </a>
 </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>File Name</th>
-            <th>Status</th>
-            <th>Amount</th>
-            <th>Vendor</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for receipt in receipts %}
-        <tr>
-            <td>{{ receipt.upload_timestamp|date:"Y-m-d" }}</td>
-            <td>{{ receipt.file_name }}</td>
-            <td>
-                <span class="badge bg-{% if receipt.is_approved %}success{% elif receipt.is_rejected %}danger{% else %}warning{% endif %}">
-                    {{ receipt.get_status_display }}
-                </span>
-            </td>
-            <td>${{ receipt.expense_data.amount|default:'-' }}</td>
-            <td>{{ receipt.expense_data.vendor|default:'-' }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="5" class="text-center">No receipts uploaded yet.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>File Name</th>
+                        <th>Status</th>
+                        <th>Amount</th>
+                        <th>Vendor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for receipt in receipts %}
+                    <tr>
+                        <td>{{ receipt.upload_timestamp|date:"M d, Y" }}</td>
+                        <td>
+                            <i class="bi bi-file-earmark me-1 text-muted"></i>
+                            {{ receipt.file_name|truncatechars:25 }}
+                        </td>
+                        <td>
+                            {% if receipt.status == 'approved' %}
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Approved</span>
+                            {% elif receipt.status == 'rejected' %}
+                                <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Rejected</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>Pending</span>
+                            {% endif %}
+                        </td>
+                        <td><strong>${{ receipt.expense_data.amount|default:'0.00' }}</strong></td>
+                        <td>{{ receipt.expense_data.vendor|default:'-' }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <i class="bi bi-receipt"></i>
+                                <p class="mb-0">No receipts uploaded yet</p>
+                                <a href="{% url 'budget:receipt_upload' %}" class="btn btn-primary btn-sm mt-2">
+                                    <i class="bi bi-upload me-1"></i>Upload Your First Receipt
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}

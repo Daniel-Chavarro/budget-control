@@ -1,66 +1,154 @@
 {% extends "budget/base.html" %}
 
-{% block title %}Upload Receipt{% endblock %}
+{% block title %}Upload Receipt - Budget Control{% endblock %}
+
+{% block extra_css %}
+<style>
+    .upload-step {
+        counter-reset: step;
+    }
+    
+    .step-indicator {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .step {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .step-number {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .step.active .step-number {
+        background: var(--primary);
+        color: white;
+    }
+    
+    .step.completed .step-number {
+        background: var(--success);
+        color: white;
+    }
+    
+    .step.inactive .step-number {
+        background: #e9ecef;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<h2>Upload Receipt</h2>
+<div class="page-header">
+    <h1 class="page-title"><i class="bi bi-upload me-2"></i>Upload Receipt</h1>
+    <p class="page-subtitle">Submit receipts for common area expenses</p>
+</div>
+
+<div class="step-indicator mb-4">
+    <div class="step {% if not expense_form %}active{% else %}completed{% endif %}">
+        <span class="step-number">1</span>
+        <span class="fw-medium">Upload File</span>
+    </div>
+    <div class="flex-grow-1 border-top"></div>
+    <div class="step {% if expense_form %}active{% else %}inactive{% endif %}">
+        <span class="step-number">2</span>
+        <span class="fw-medium">Review & Submit</span>
+    </div>
+</div>
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-lg-{% if receipt_url %}7{% else %}8 mx-auto{% endif %}">
         {% if not expense_form %}
         <div class="card">
-            <div class="card-header">Step 1: Upload File</div>
+            <div class="card-header">
+                <i class="bi bi-cloud-upload me-2"></i>Step 1: Upload File
+            </div>
             <div class="card-body">
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     {% for field in upload_form %}
                         <div class="mb-3">
-                            <label class="form-label">{{ field.label }}</label>
+                            <label class="form-label fw-medium">
+                                {{ field.label }}
+                                {% if field.field.required %}
+                                    <span class="text-danger">*</span>
+                                {% endif %}
+                            </label>
                             {{ field }}
                             {% if field.errors %}
-                                <div class="text-danger">{{ field.errors }}</div>
+                                <div class="text-danger small mt-1">{{ field.errors }}</div>
                             {% endif %}
                             {% if field.help_text %}
-                                <small class="text-muted">{{ field.help_text }}</small>
+                                <small class="form-text text-muted">{{ field.help_text }}</small>
                             {% endif %}
                         </div>
                     {% endfor %}
-                    <button type="submit" class="btn btn-primary">Process Receipt</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-gear me-1"></i>Process Receipt
+                    </button>
                 </form>
             </div>
         </div>
         {% else %}
         <div class="card">
-            <div class="card-header">Step 2: Review & Submit</div>
+            <div class="card-header">
+                <i class="bi bi-clipboard-check me-2"></i>Step 2: Review & Submit
+            </div>
             <div class="card-body">
                 <form method="post">
                     {% csrf_token %}
-                    {% for field in expense_form %}
-                        <div class="mb-3">
-                            <label class="form-label">{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.errors %}
-                                <div class="text-danger">{{ field.errors }}</div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                    <button type="submit" name="submit_receipt" class="btn btn-success">Submit</button>
-                    <a href="{% url 'budget:receipt_upload' %}" class="btn btn-secondary">Cancel</a>
+                    <div class="row">
+                        {% for field in expense_form %}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-medium">
+                                    {{ field.label }}
+                                    {% if field.field.required %}
+                                        <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="text-danger small mt-1">{{ field.errors }}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" name="submit_receipt" class="btn btn-success">
+                            <i class="bi bi-send me-1"></i>Submit Receipt
+                        </button>
+                        <a href="{% url 'budget:receipt_upload' %}" class="btn btn-secondary">
+                            <i class="bi bi-x-lg me-1"></i>Cancel
+                        </a>
+                    </div>
                 </form>
             </div>
         </div>
         {% endif %}
     </div>
     
-    <div class="col-md-6">
-        {% if receipt_url %}
-        <div class="card">
-            <div class="card-header">Receipt Preview</div>
-            <div class="card-body">
-                <img src="{{ receipt_url }}" alt="Receipt" class="img-fluid" />
+    {% if receipt_url %}
+    <div class="col-lg-5">
+        <div class="card sticky-top" style="top: 1rem;">
+            <div class="card-header">
+                <i class="bi bi-image me-2"></i>Receipt Preview
+            </div>
+            <div class="card-body p-2">
+                <img src="{{ receipt_url }}" alt="Receipt preview" class="img-fluid rounded" />
             </div>
         </div>
-        {% endif %}
     </div>
+    {% endif %}
 </div>
 {% endblock %}

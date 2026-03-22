@@ -3,37 +3,81 @@
 {% block title %}All Receipts - Budget Control{% endblock %}
 
 {% block content %}
-<h2>All Receipts</h2>
-
-<div class="mb-3">
-    <a href="?status=all" class="btn btn-sm btn-outline-primary">All</a>
-    <a href="?status=pending_review" class="btn btn-sm btn-outline-warning">Pending</a>
-    <a href="?status=approved" class="btn btn-sm btn-outline-success">Approved</a>
-    <a href="?status=rejected" class="btn btn-sm btn-outline-danger">Rejected</a>
+<div class="page-header">
+    <h1 class="page-title"><i class="bi bi-files me-2"></i>All Receipts</h1>
+    <p class="page-subtitle">View all receipts in the system</p>
 </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>File</th>
-            <th>Uploader</th>
-            <th>Status</th>
-            <th>Vendor</th>
-            <th>Amount</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for receipt in receipts %}
-        <tr>
-            <td>{{ receipt.upload_timestamp|date:"Y-m-d" }}</td>
-            <td>{{ receipt.file_name }}</td>
-            <td>{{ receipt.uploaded_by.username }}</td>
-            <td><span class="badge bg-{{ receipt.is_approved and 'success' or 'warning' }}">{{ receipt.get_status_display }}</span></td>
-            <td>{{ receipt.expense_data.vendor|default:'-' }}</td>
-            <td>${{ receipt.expense_data.amount|default:'-' }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="btn-group" role="group">
+            <a href="?status=all" class="btn btn-sm {% if not selected_status or selected_status == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                <i class="bi bi-list me-1"></i>All
+            </a>
+            <a href="?status=pending_review" class="btn btn-sm {% if selected_status == 'pending_review' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+                <i class="bi bi-clock me-1"></i>Pending
+            </a>
+            <a href="?status=approved" class="btn btn-sm {% if selected_status == 'approved' %}btn-success{% else %}btn-outline-success{% endif %}">
+                <i class="bi bi-check-circle me-1"></i>Approved
+            </a>
+            <a href="?status=rejected" class="btn btn-sm {% if selected_status == 'rejected' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                <i class="bi bi-x-circle me-1"></i>Rejected
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>File</th>
+                        <th>Uploader</th>
+                        <th>Status</th>
+                        <th>Vendor</th>
+                        <th class="text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for receipt in receipts %}
+                    <tr>
+                        <td>{{ receipt.upload_timestamp|date:"M d, Y" }}</td>
+                        <td>
+                            <i class="bi bi-file-earmark me-1 text-muted"></i>
+                            {{ receipt.file_name|truncatechars:25 }}
+                        </td>
+                        <td>
+                            <i class="bi bi-person me-1 text-muted"></i>
+                            {{ receipt.uploaded_by.username }}
+                        </td>
+                        <td>
+                            {% if receipt.status == 'approved' %}
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Approved</span>
+                            {% elif receipt.status == 'rejected' %}
+                                <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Rejected</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>Pending</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ receipt.expense_data.vendor|default:'-' }}</td>
+                        <td class="text-end"><strong>${{ receipt.expense_data.amount|default:'0.00' }}</strong></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <i class="bi bi-inbox"></i>
+                                <p class="mb-0">No receipts found</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}
