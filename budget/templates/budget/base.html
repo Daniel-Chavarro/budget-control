@@ -12,6 +12,9 @@
         <div class="container">
             <a class="navbar-brand" href="{% url 'budget:dashboard' %}">Budget Control</a>
             <div class="navbar-nav ms-auto">
+                {% if user.is_authenticated and user.userprofile.is_admin %}
+                    <a class="nav-link" href="{% url 'budget:unit_list' %}">Units</a>
+                {% endif %}
                 {% if user.is_authenticated %}
                     <span class="navbar-text me-3">
                         {{ user.username }} ({{ user.userprofile.role }})
