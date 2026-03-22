@@ -6,6 +6,7 @@ from budget.views import pending_receipts_view, receipt_detail_view, all_receipt
 from budget.views.management import (
     unit_list_view, unit_create_view, unit_edit_view, unit_delete_view
 )
+from budget.views.reports import expense_report_view
 
 app_name = 'budget'
 
@@ -23,4 +24,5 @@ urlpatterns = [
     path('review/pending/', pending_receipts_view, name='pending_receipts'),
     path('review/<int:pk>/', receipt_detail_view, name='receipt_detail'),
     path('review/all/', all_receipts_view, name='all_receipts'),
+    path('reports/expenses/', expense_report_view, name='expense_report'),
 ]
