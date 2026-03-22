@@ -8,5 +8,6 @@ def dashboard_view(request):
 
 
 from .auth import register_view, login_view, logout_view
+from .receipts import receipt_upload_view, receipt_list_view
 
-__all__ = ['register_view', 'login_view', 'logout_view', 'dashboard_view']
+__all__ = ['register_view', 'login_view', 'logout_view', 'dashboard_view', 'receipt_upload_view', 'receipt_list_view']

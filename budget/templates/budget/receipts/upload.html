@@ -1,0 +1,66 @@
+{% extends "budget/base.html" %}
+
+{% block title %}Upload Receipt{% endblock %}
+
+{% block content %}
+<h2>Upload Receipt</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        {% if not expense_form %}
+        <div class="card">
+            <div class="card-header">Step 1: Upload File</div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% for field in upload_form %}
+                        <div class="mb-3">
+                            <label class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger">{{ field.errors }}</div>
+                            {% endif %}
+                            {% if field.help_text %}
+                                <small class="text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary">Process Receipt</button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="card-header">Step 2: Review & Submit</div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in expense_form %}
+                        <div class="mb-3">
+                            <label class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" name="submit_receipt" class="btn btn-success">Submit</button>
+                    <a href="{% url 'budget:receipt_upload' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-6">
+        {% if receipt_url %}
+        <div class="card">
+            <div class="card-header">Receipt Preview</div>
+            <div class="card-body">
+                <img src="{{ receipt_url }}" alt="Receipt" class="img-fluid" />
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

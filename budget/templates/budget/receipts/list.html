@@ -1,0 +1,41 @@
+{% extends "budget/base.html" %}
+
+{% block title %}My Receipts{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between mb-4">
+    <h2>My Receipts</h2>
+    <a href="{% url 'budget:receipt_upload' %}" class="btn btn-primary">Upload Receipt</a>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>File Name</th>
+            <th>Status</th>
+            <th>Amount</th>
+            <th>Vendor</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for receipt in receipts %}
+        <tr>
+            <td>{{ receipt.upload_timestamp|date:"Y-m-d" }}</td>
+            <td>{{ receipt.file_name }}</td>
+            <td>
+                <span class="badge bg-{% if receipt.is_approved %}success{% elif receipt.is_rejected %}danger{% else %}warning{% endif %}">
+                    {{ receipt.get_status_display }}
+                </span>
+            </td>
+            <td>${{ receipt.expense_data.amount|default:'-' }}</td>
+            <td>{{ receipt.expense_data.vendor|default:'-' }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" class="text-center">No receipts uploaded yet.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
