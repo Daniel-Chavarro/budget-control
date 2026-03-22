@@ -1,18 +1,18 @@
 {% extends "budget/base.html" %}
 
-{% block title %}Add User - Budget Control{% endblock %}
+{% block title %}Agregar Usuario - Control de Gastos{% endblock %}
 
 {% block content %}
 <div class="page-header">
-    <h1 class="page-title"><i class="bi bi-person-plus me-2"></i>Add User</h1>
-    <p class="page-subtitle">Create a new tenant or unlinked user account</p>
+    <h1 class="page-title"><i class="bi bi-person-plus me-2"></i>Agregar Usuario</h1>
+    <p class="page-subtitle">Crear una cuenta para inquilino o usuario sin vínculo</p>
 </div>
 
 <div class="row">
     <div class="col-lg-7">
         <div class="card">
             <div class="card-header">
-                <i class="bi bi-person-badge me-2"></i>User Information
+                <i class="bi bi-person-badge me-2"></i>Información del Usuario
             </div>
             <div class="card-body">
                 <form method="post">
@@ -20,7 +20,7 @@
                     
                     <div class="mb-4">
                         <label class="form-label fw-medium">
-                            User Role <span class="text-danger">*</span>
+                            Rol del Usuario <span class="text-danger">*</span>
                         </label>
                         <div class="row g-2">
                             <div class="col-6">
@@ -28,7 +28,7 @@
                                     <input class="form-check-input" type="radio" name="role" id="role_tenant" 
                                            value="tenant" {% if role == 'tenant' %}checked{% endif %}>
                                     <label class="form-check-label" for="role_tenant">
-                                        <i class="bi bi-house me-1"></i>Tenant
+                                        <i class="bi bi-house me-1"></i>Inquilino
                                     </label>
                                 </div>
                             </div>
@@ -37,13 +37,13 @@
                                     <input class="form-check-input" type="radio" name="role" id="role_unlinked" 
                                            value="unlinked_user" {% if role == 'unlinked_user' %}checked{% endif %}>
                                     <label class="form-check-label" for="role_unlinked">
-                                        <i class="bi bi-car-front me-1"></i>Unlinked User
+                                        <i class="bi bi-car-front me-1"></i>Sin Vínculo
                                     </label>
                                 </div>
                             </div>
                         </div>
                         <small class="form-text text-muted">
-                            Tenants live in the building. Unlinked users only pay for parking.
+                            Los inquilinos viven en el edificio. Los usuarios sin vínculo solo pagan estacionamiento.
                         </small>
                     </div>
                     
@@ -52,7 +52,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-medium">
-                                Username <span class="text-danger">*</span>
+                                Nombre de Usuario <span class="text-danger">*</span>
                             </label>
                             <input type="text" name="username" class="form-control" required>
                             {% if form.username.errors %}
@@ -62,7 +62,7 @@
                         
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-medium">
-                                Password <span class="text-danger">*</span>
+                                Contraseña <span class="text-danger">*</span>
                             </label>
                             <input type="password" name="password" class="form-control" required>
                             {% if form.password.errors %}
@@ -72,7 +72,7 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label class="form-label fw-medium">Email</label>
+                        <label class="form-label fw-medium">Correo Electrónico</label>
                         <input type="email" name="email" class="form-control">
                         {% if form.email.errors %}
                             <div class="text-danger small mt-1">{{ form.email.errors }}</div>
@@ -81,22 +81,22 @@
                     
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-medium">First Name</label>
+                            <label class="form-label fw-medium">Nombre</label>
                             <input type="text" name="first_name" class="form-control">
                         </div>
                         
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-medium">Last Name</label>
+                            <label class="form-label fw-medium">Apellido</label>
                             <input type="text" name="last_name" class="form-control">
                         </div>
                     </div>
                     
                     <div class="d-flex gap-2 mt-4">
                         <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-check-lg me-1"></i>Create User
+                            <i class="bi bi-check-lg me-1"></i>Crear Usuario
                         </button>
                         <a href="{% url 'budget:user_management' %}" class="btn btn-secondary">
-                            <i class="bi bi-x-lg me-1"></i>Cancel
+                            <i class="bi bi-x-lg me-1"></i>Cancelar
                         </a>
                     </div>
                 </form>
@@ -105,30 +105,27 @@
     </div>
     
     <div class="col-lg-5">
-        <div class="card bg-light">
+        <div class="card" style="background: var(--gray-50);">
             <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-info-circle me-2"></i>Role Information</h5>
+                <h5 class="card-title"><i class="bi bi-info-circle me-2"></i>Información de Roles</h5>
                 
                 <div class="mt-3">
-                    <h6><i class="bi bi-house me-2 text-primary"></i>Tenant</h6>
+                    <h6><i class="bi bi-house me-2 text-primary"></i>Inquilino</h6>
                     <p class="text-muted small mb-0">
-                        Users who live in the building. Can upload receipts for common area expenses 
-                        and view approved expenses.
+                        Usuarios que viven en el edificio. Pueden subir recibos de gastos comunes y ver gastos aprobados.
                     </p>
                 </div>
                 
                 <div class="mt-3">
-                    <h6><i class="bi bi-car-front me-2 text-secondary"></i>Unlinked User</h6>
+                    <h6><i class="bi bi-car-front me-2 text-secondary"></i>Sin Vínculo</h6>
                     <p class="text-muted small mb-0">
-                        Users who only pay for parking slots but don't live in the building. 
-                        Can upload receipts and view expenses.
+                        Usuarios que solo pagan por espacios de estacionamiento pero no viven en el edificio.
                     </p>
                 </div>
                 
                 <div class="alert alert-warning mt-4 mb-0">
                     <i class="bi bi-shield-exclamation me-1"></i>
-                    <strong>Note:</strong> Users cannot register themselves. Only admins can create accounts 
-                    for security purposes.
+                    <strong>Nota:</strong> Los usuarios no pueden registrarse por su cuenta. Solo los administradores pueden crear cuentas por seguridad.
                 </div>
             </div>
         </div>

@@ -1,7 +1,7 @@
-"""Management forms for units and users."""
+"""Management forms for units, users, and categories."""
 from django import forms
 from django.contrib.auth.models import User
-from budget.models import Unit, UserUnit, UserProfile
+from budget.models import Unit, UserUnit, UserProfile, Category
 
 
 class UnitForm(forms.ModelForm):
@@ -60,3 +60,23 @@ class UserCreateForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+
+class CategoryForm(forms.ModelForm):
+    """Form for creating/editing categories."""
+    
+    class Meta:
+        model = Category
+        fields = ['name', 'name_es', 'category_type', 'is_active']
+        labels = {
+            'name': 'Nombre (ingles)',
+            'name_es': 'Nombre (espanol)',
+            'category_type': 'Tipo',
+            'is_active': 'Activo',
+        }
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'name_es': forms.TextInput(attrs={'class': 'form-control'}),
+            'category_type': forms.Select(attrs={'class': 'form-select'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }

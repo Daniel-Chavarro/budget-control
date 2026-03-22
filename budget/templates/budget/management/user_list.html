@@ -1,15 +1,15 @@
 {% extends "budget/base.html" %}
 
-{% block title %}Users - Budget Control{% endblock %}
+{% block title %}Usuarios - Control de Gastos{% endblock %}
 
 {% block content %}
 <div class="page-header d-flex justify-content-between align-items-start">
     <div>
-        <h1 class="page-title"><i class="bi bi-people me-2"></i>Users</h1>
-        <p class="page-subtitle">Manage tenants and unlinked users</p>
+        <h1 class="page-title"><i class="bi bi-people me-2"></i>Usuarios</h1>
+        <p class="page-subtitle">Gestionar inquilinos y usuarios sin vínculo</p>
     </div>
     <a href="{% url 'budget:user_create' %}" class="btn btn-primary">
-        <i class="bi bi-person-plus me-1"></i>Add User
+        <i class="bi bi-person-plus me-1"></i>Agregar Usuario
     </a>
 </div>
 
@@ -19,51 +19,51 @@
             <table class="table table-hover mb-0">
                 <thead>
                     <tr>
-                        <th>Username</th>
+                        <th>Usuario</th>
                         <th>Email</th>
-                        <th>Name</th>
-                        <th>Role</th>
-                        <th>Receipts</th>
-                        <th>Actions</th>
+                        <th>Nombre</th>
+                        <th>Rol</th>
+                        <th>Recibos</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for user in users %}
+                    {% for u in users %}
                     <tr>
                         <td>
                             <i class="bi bi-person me-1 text-muted"></i>
-                            <span class="fw-medium">{{ user.username }}</span>
+                            <span class="fw-medium">{{ u.username }}</span>
                         </td>
-                        <td>{{ user.email|default:'-' }}</td>
+                        <td>{{ u.email|default:'-' }}</td>
                         <td>
-                            {% if user.first_name or user.last_name %}
-                                {{ user.first_name }} {{ user.last_name }}
+                            {% if u.first_name or u.last_name %}
+                                {{ u.first_name }} {{ u.last_name }}
                             {% else %}
                                 <span class="text-muted">-</span>
                             {% endif %}
                         </td>
                         <td>
-                            {% with profile=user.userprofile %}
+                            {% with profile=u.userprofile %}
                                 {% if profile.is_admin %}
                                     <span class="badge bg-danger"><i class="bi bi-shield-check me-1"></i>Admin</span>
                                 {% elif profile.role == 'tenant' %}
-                                    <span class="badge bg-primary"><i class="bi bi-house me-1"></i>Tenant</span>
+                                    <span class="badge bg-primary"><i class="bi bi-house me-1"></i>Inquilino</span>
                                 {% else %}
-                                    <span class="badge bg-secondary"><i class="bi bi-car-front me-1"></i>Unlinked</span>
+                                    <span class="badge bg-secondary"><i class="bi bi-car-front me-1"></i>Sin Vínculo</span>
                                 {% endif %}
                             {% endwith %}
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark">{{ user.uploaded_receipts.count }}</span>
+                            <span class="badge bg-light text-dark">{{ u.uploaded_receipts.count }}</span>
                         </td>
                         <td class="action-buttons">
-                            {% if not user.is_superuser %}
-                                <a href="{% url 'budget:user_delete' user.pk %}" class="btn btn-sm btn-outline-danger"
-                                   onclick="return confirm('Delete user {{ user.username }}? This action cannot be undone.')">
+                            {% if not u.is_superuser %}
+                                <a href="{% url 'budget:user_delete' u.pk %}" class="btn btn-sm btn-outline-danger"
+                                   onclick="return confirm('¿Eliminar usuario {{ u.username }}? Esta acción no se puede deshacer.')">
                                     <i class="bi bi-trash"></i>
                                 </a>
                             {% else %}
-                                <span class="text-muted small">Protected</span>
+                                <span class="text-muted small">Protegido</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -72,9 +72,9 @@
                         <td colspan="6">
                             <div class="empty-state">
                                 <i class="bi bi-people"></i>
-                                <p class="mb-0">No users found</p>
+                                <p class="mb-0">No hay usuarios registrados</p>
                                 <a href="{% url 'budget:user_create' %}" class="btn btn-primary btn-sm mt-2">
-                                    <i class="bi bi-person-plus me-1"></i>Add First User
+                                    <i class="bi bi-person-plus me-1"></i>Agregar Primer Usuario
                                 </a>
                             </div>
                         </td>

@@ -1,0 +1,109 @@
+{% extends "budget/base.html" %}
+
+{% block title %}Categorias - Control de Presupuesto{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><i class="bi bi-tags me-2"></i>Categorias</h1>
+    <a href="{% url 'budget:category_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Nueva Categoria
+    </a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-danger bg-opacity-10">
+                <i class="bi bi-arrow-down-circle me-2 text-danger"></i>Gastos
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Estado</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cat in categories %}
+                            {% if cat.category_type == 'expense' %}
+                            <tr>
+                                <td>
+                                    <span class="fw-medium">{{ cat.name_es }}</span>
+                                    <small class="text-muted d-block">{{ cat.name }}</small>
+                                </td>
+                                <td>
+                                    {% if cat.is_active %}
+                                        <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <a href="{% url 'budget:category_edit' cat.pk %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'budget:category_delete' cat.pk %}" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success bg-opacity-10">
+                <i class="bi bi-arrow-up-circle me-2 text-success"></i>Ingresos
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Estado</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cat in categories %}
+                            {% if cat.category_type == 'income' %}
+                            <tr>
+                                <td>
+                                    <span class="fw-medium">{{ cat.name_es }}</span>
+                                    <small class="text-muted d-block">{{ cat.name }}</small>
+                                </td>
+                                <td>
+                                    {% if cat.is_active %}
+                                        <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <a href="{% url 'budget:category_edit' cat.pk %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'budget:category_delete' cat.pk %}" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

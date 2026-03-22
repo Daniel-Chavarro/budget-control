@@ -1,11 +1,11 @@
 {% extends "budget/base.html" %}
 
-{% block title %}Pending Receipts - Budget Control{% endblock %}
+{% block title %}Recibos Pendientes - Control de Gastos{% endblock %}
 
 {% block content %}
 <div class="page-header">
-    <h1 class="page-title"><i class="bi bi-clock-history me-2"></i>Pending Receipts</h1>
-    <p class="page-subtitle">Review and approve submitted receipts</p>
+    <h1 class="page-title"><i class="bi bi-clock-history me-2"></i>Recibos Pendientes</h1>
+    <p class="page-subtitle">Revisar y aprobar recibos enviados</p>
 </div>
 
 <div class="card">
@@ -14,18 +14,18 @@
             <table class="table table-hover mb-0">
                 <thead>
                     <tr>
-                        <th>Upload Date</th>
-                        <th>File Name</th>
-                        <th>Uploaded By</th>
-                        <th>Vendor</th>
-                        <th>Amount</th>
-                        <th>Actions</th>
+                        <th>Fecha de Upload</th>
+                        <th>Nombre del Archivo</th>
+                        <th>Subido Por</th>
+                        <th>Proveedor</th>
+                        <th>Monto</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for receipt in pending_receipts %}
                     <tr>
-                        <td>{{ receipt.upload_timestamp|date:"M d, Y H:i" }}</td>
+                        <td>{{ receipt.upload_timestamp|date:"d M, Y H:i" }}</td>
                         <td>
                             <i class="bi bi-file-earmark me-1 text-muted"></i>
                             {{ receipt.file_name|truncatechars:25 }}
@@ -38,7 +38,7 @@
                         <td><strong>${{ receipt.expense_data.amount|default:'0.00' }}</strong></td>
                         <td>
                             <a href="{% url 'budget:receipt_detail' receipt.pk %}" class="btn btn-sm btn-primary">
-                                <i class="bi bi-eye me-1"></i>Review
+                                <i class="bi bi-eye me-1"></i>Revisar
                             </a>
                         </td>
                     </tr>
@@ -47,8 +47,8 @@
                         <td colspan="6">
                             <div class="empty-state">
                                 <i class="bi bi-check-circle"></i>
-                                <p class="mb-0">No pending receipts</p>
-                                <span class="text-muted small">All caught up!</span>
+                                <p class="mb-0">No hay recibos pendientes</p>
+                                <span class="text-muted small">¡Todo al día!</span>
                             </div>
                         </td>
                     </tr>

@@ -1,10 +1,10 @@
-"""Management views for units and users (admin only)."""
+"""Management views for units, users, and categories (admin only)."""
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User
 from budget.decorators import admin_required
-from budget.models import Unit, UserUnit, UserProfile
-from budget.forms import UnitForm, UserUnitForm, UserCreateForm
+from budget.models import Unit, UserUnit, UserProfile, Category
+from budget.forms import UnitForm, UserUnitForm, UserCreateForm, CategoryForm
 
 
 @admin_required
@@ -79,7 +79,9 @@ def user_create_view(request):
         
         if user_form.is_valid():
             user = user_form.save()
-            UserProfile.objects.create(user=user, role=role)
+            profile = UserProfile.objects.get_or_create(user=user)[0]
+            profile.role = role
+            profile.save()
             messages.success(request, f'User {user.username} created successfully.')
             return redirect('budget:user_management')
     else:
@@ -106,3 +108,65 @@ def user_delete_view(request, pk):
     user.delete()
     messages.success(request, f'User {username} deleted successfully.')
     return redirect('budget:user_management')
+
+
+@admin_required
+def category_list_view(request):
+    """List all categories."""
+    categories = Category.objects.all()
+    return render(request, 'budget/management/category_list.html', {'categories': categories})
+
+
+@admin_required
+def category_create_view(request):
+    """Create new category."""
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            category = form.save()
+            messages.success(request, f'Categoria {category.name_es} creada exitosamente.')
+            return redirect('budget:category_list')
+    else:
+        form = CategoryForm()
+    
+    return render(request, 'budget/management/category_form.html', {
+        'form': form,
+        'action': 'Crear'
+    })
+
+
+@admin_required
+def category_edit_view(request, pk):
+    """Edit existing category."""
+    category = get_object_or_404(Category, pk=pk)
+    
+    if request.method == 'POST':
+        form = CategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            category = form.save()
+            messages.success(request, f'Categoria {category.name_es} actualizada exitosamente.')
+            return redirect('budget:category_list')
+    else:
+        form = CategoryForm(instance=category)
+    
+    return render(request, 'budget/management/category_form.html', {
+        'form': form,
+        'action': 'Editar',
+        'category': category
+    })
+
+
+@admin_required
+def category_delete_view(request, pk):
+    """Delete category (soft delete by deactivating)."""
+    category = get_object_or_404(Category, pk=pk)
+    
+    if request.method == 'POST':
+        category.is_active = False
+        category.save()
+        messages.success(request, f'Categoria {category.name_es} desactivada.')
+        return redirect('budget:category_list')
+    
+    return render(request, 'budget/management/category_delete.html', {
+        'category': category
+    })

@@ -1,15 +1,15 @@
 {% extends "budget/base.html" %}
 
-{% block title %}My Receipts - Budget Control{% endblock %}
+{% block title %}Recibos - Control de Gastos{% endblock %}
 
 {% block content %}
 <div class="page-header d-flex justify-content-between align-items-start">
     <div>
-        <h1 class="page-title"><i class="bi bi-receipt me-2"></i>My Receipts</h1>
-        <p class="page-subtitle">View and manage your uploaded receipts</p>
+        <h1 class="page-title"><i class="bi bi-receipt me-2"></i>Recibos</h1>
+        <p class="page-subtitle">Ver y gestionar tus comprobantes</p>
     </div>
     <a href="{% url 'budget:receipt_upload' %}" class="btn btn-primary">
-        <i class="bi bi-upload me-1"></i>Upload Receipt
+        <i class="bi bi-upload me-1"></i>Subir Comprobante
     </a>
 </div>
 
@@ -19,41 +19,61 @@
             <table class="table table-hover mb-0">
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>File Name</th>
-                        <th>Status</th>
-                        <th>Amount</th>
-                        <th>Vendor</th>
+                        <th>Fecha</th>
+                        <th>Nombre del Archivo</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th class="text-end">Monto</th>
+                        <th>Proveedor/Pagador</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for receipt in receipts %}
                     <tr>
-                        <td>{{ receipt.upload_timestamp|date:"M d, Y" }}</td>
+                        <td>{{ receipt.upload_timestamp|date:"d M, Y" }}</td>
                         <td>
                             <i class="bi bi-file-earmark me-1 text-muted"></i>
                             {{ receipt.file_name|truncatechars:25 }}
                         </td>
                         <td>
-                            {% if receipt.status == 'approved' %}
-                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Approved</span>
-                            {% elif receipt.status == 'rejected' %}
-                                <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Rejected</span>
+                            {% if receipt.receipt_type == 'income' %}
+                                <span class="badge bg-success">Ingreso</span>
                             {% else %}
-                                <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>Pending</span>
+                                <span class="badge bg-danger">Gasto</span>
                             {% endif %}
                         </td>
-                        <td><strong>${{ receipt.expense_data.amount|default:'0.00' }}</strong></td>
-                        <td>{{ receipt.expense_data.vendor|default:'-' }}</td>
+                        <td>
+                            {% if receipt.status == 'approved' %}
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Aprobado</span>
+                            {% elif receipt.status == 'rejected' %}
+                                <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Rechazado</span>
+                            {% else %}
+                                <span class="badge bg-warning"><i class="bi bi-clock me-1"></i>Pendiente</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            {% if receipt.receipt_type == 'income' %}
+                                <strong class="text-success">${{ receipt.income_data.amount|default:'0.00' }}</strong>
+                            {% else %}
+                                <strong class="text-danger">${{ receipt.expense_data.amount|default:'0.00' }}</strong>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if receipt.receipt_type == 'income' %}
+                                {{ receipt.income_data.payer|default:'-' }}
+                            {% else %}
+                                {{ receipt.expense_data.vendor|default:'-' }}
+                            {% endif %}
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5">
+                        <td colspan="6">
                             <div class="empty-state">
                                 <i class="bi bi-receipt"></i>
-                                <p class="mb-0">No receipts uploaded yet</p>
+                                <p class="mb-0">No has subido comprobantes aun</p>
                                 <a href="{% url 'budget:receipt_upload' %}" class="btn btn-primary btn-sm mt-2">
-                                    <i class="bi bi-upload me-1"></i>Upload Your First Receipt
+                                    <i class="bi bi-upload me-1"></i>Subir Tu Primer Comprobante
                                 </a>
                             </div>
                         </td>

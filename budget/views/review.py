@@ -1,4 +1,5 @@
 """Admin review workflow views."""
+import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
@@ -6,11 +7,14 @@ from budget.decorators import admin_required
 from budget.models import Receipt, ExpenseData
 from budget.forms import ExpenseDataForm
 
+logger = logging.getLogger(__name__)
+
 
 @admin_required
 def pending_receipts_view(request):
     """List all pending receipts for review."""
     pending_receipts = Receipt.objects.filter(status='pending_review')
+    logger.debug(f"[REVIEW] Admin {request.user} viewing pending receipts, count: {pending_receipts.count()}")
     return render(request, 'budget/review/pending_list.html', {
         'pending_receipts': pending_receipts
     })
@@ -20,6 +24,7 @@ def pending_receipts_view(request):
 def receipt_detail_view(request, pk):
     """Detailed receipt review page."""
     receipt = get_object_or_404(Receipt, pk=pk)
+    logger.debug(f"[REVIEW] Admin {request.user} viewing receipt detail: {receipt.file_name}")
     
     try:
         expense_data = receipt.expense_data
@@ -28,6 +33,7 @@ def receipt_detail_view(request, pk):
     
     if request.method == 'POST':
         action = request.POST.get('action')
+        logger.debug(f"[REVIEW] Action received: {action} for receipt {receipt.id}")
         
         if action == 'approve':
             if expense_data:
@@ -41,6 +47,7 @@ def receipt_detail_view(request, pk):
                     expense.receipt = receipt
                 expense.modified_by_user = True
                 expense.save()
+                logger.info(f"[REVIEW] Expense data updated: vendor={expense.vendor}, amount={expense.amount}")
                 
                 receipt.status = 'approved'
                 receipt.reviewed_by = request.user
@@ -48,13 +55,16 @@ def receipt_detail_view(request, pk):
                 receipt.review_notes = request.POST.get('review_notes', '')
                 receipt.save()
                 
+                logger.info(f"[REVIEW] Receipt {receipt.id} APPROVED by {request.user}")
                 messages.success(request, f'Receipt {receipt.file_name} approved.')
                 return redirect('budget:pending_receipts')
         
         elif action == 'reject':
             notes = request.POST.get('review_notes', '')
+            logger.debug(f"[REVIEW] Rejection notes: {notes[:50]}...")
             
             if not notes:
+                logger.warning(f"[REVIEW] Rejection rejected - no notes provided")
                 messages.error(request, 'Rejection notes are required.')
             else:
                 receipt.status = 'rejected'
@@ -63,6 +73,7 @@ def receipt_detail_view(request, pk):
                 receipt.review_notes = notes
                 receipt.save()
                 
+                logger.info(f"[REVIEW] Receipt {receipt.id} REJECTED by {request.user}")
                 messages.success(request, f'Receipt {receipt.file_name} rejected.')
                 return redirect('budget:pending_receipts')
     
@@ -83,6 +94,7 @@ def receipt_detail_view(request, pk):
 def all_receipts_view(request):
     """List all receipts with filtering."""
     status_filter = request.GET.get('status', 'all')
+    logger.debug(f"[REVIEW] Admin {request.user} viewing all receipts with filter: {status_filter}")
     
     receipts = Receipt.objects.all()
     if status_filter != 'all':
@@ -90,5 +102,5 @@ def all_receipts_view(request):
     
     return render(request, 'budget/review/all_receipts.html', {
         'receipts': receipts,
-        'status_filter': status_filter
+        'selected_status': status_filter
     })

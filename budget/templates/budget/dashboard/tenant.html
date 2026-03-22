@@ -1,11 +1,11 @@
 {% extends "budget/base.html" %}
 
-{% block title %}Dashboard - Budget Control{% endblock %}
+{% block title %}Inicio - Control de Gastos{% endblock %}
 
 {% block content %}
 <div class="page-header">
-    <h1 class="page-title">Welcome, {{ user.username }}</h1>
-    <p class="page-subtitle">Your expense overview</p>
+    <h1 class="page-title">Bienvenido, {{ user.username }}</h1>
+    <p class="page-subtitle">Resumen de tus gastos</p>
 </div>
 
 <div class="row mb-4">
@@ -13,12 +13,12 @@
         <div class="card stat-card h-100">
             <div class="card-body">
                 <div class="d-flex align-items-center">
-                    <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                    <div class="stat-icon" style="background: var(--primary-light); color: var(--primary);">
                         <i class="bi bi-calendar-month"></i>
                     </div>
                     <div class="ms-3">
-                        <div class="stat-label">This Month</div>
-                        <div class="stat-value text-primary">${{ month_total|floatformat:2 }}</div>
+                        <div class="stat-label">Este Mes</div>
+                        <div class="stat-value" style="color: var(--primary);">${{ month_total|floatformat:2 }}</div>
                     </div>
                 </div>
             </div>
@@ -28,12 +28,12 @@
         <div class="card stat-card h-100">
             <div class="card-body">
                 <div class="d-flex align-items-center">
-                    <div class="stat-icon bg-success bg-opacity-10 text-success">
+                    <div class="stat-icon" style="background: var(--success-light); color: var(--success);">
                         <i class="bi bi-calendar3"></i>
                     </div>
                     <div class="ms-3">
-                        <div class="stat-label">This Year</div>
-                        <div class="stat-value text-success">${{ year_total|floatformat:2 }}</div>
+                        <div class="stat-label">Este Año</div>
+                        <div class="stat-value" style="color: var(--success);">${{ year_total|floatformat:2 }}</div>
                     </div>
                 </div>
             </div>
@@ -45,9 +45,9 @@
     <div class="col-lg-7 mb-4">
         <div class="card h-100">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-receipt me-2"></i>My Receipts</span>
+                <span><i class="bi bi-receipt me-2"></i>Mis Recibos</span>
                 <a href="{% url 'budget:receipt_list' %}" class="btn btn-sm btn-outline-primary">
-                    View All <i class="bi bi-arrow-right ms-1"></i>
+                    Ver Todos <i class="bi bi-arrow-right ms-1"></i>
                 </a>
             </div>
             <div class="card-body p-0">
@@ -55,27 +55,27 @@
                     <table class="table table-hover mb-0">
                         <thead>
                             <tr>
-                                <th>Date</th>
-                                <th>File</th>
-                                <th>Status</th>
-                                <th>Amount</th>
+                                <th>Fecha</th>
+                                <th>Archivo</th>
+                                <th>Estado</th>
+                                <th>Monto</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for receipt in my_receipts %}
                             <tr>
-                                <td>{{ receipt.upload_timestamp|date:"M d, Y" }}</td>
+                                <td>{{ receipt.upload_timestamp|date:"d M, Y" }}</td>
                                 <td>
                                     <i class="bi bi-file-earmark me-1 text-muted"></i>
                                     {{ receipt.file_name|truncatechars:20 }}
                                 </td>
                                 <td>
                                     {% if receipt.status == 'approved' %}
-                                        <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Approved</span>
+                                        <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Aprobado</span>
                                     {% elif receipt.status == 'rejected' %}
-                                        <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Rejected</span>
+                                        <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Rechazado</span>
                                     {% else %}
-                                        <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>Pending</span>
+                                        <span class="badge bg-warning"><i class="bi bi-clock me-1"></i>Pendiente</span>
                                     {% endif %}
                                 </td>
                                 <td><strong>${{ receipt.expense_data.amount|default:'0.00' }}</strong></td>
@@ -85,9 +85,9 @@
                                 <td colspan="4">
                                     <div class="empty-state">
                                         <i class="bi bi-inbox"></i>
-                                        <p class="mb-0">No receipts uploaded yet</p>
+                                        <p class="mb-0">No has subido recibos aún</p>
                                         <a href="{% url 'budget:receipt_upload' %}" class="btn btn-primary btn-sm mt-2">
-                                            <i class="bi bi-upload me-1"></i>Upload Receipt
+                                            <i class="bi bi-upload me-1"></i>Subir Recibo
                                         </a>
                                     </div>
                                 </td>
@@ -103,7 +103,7 @@
     <div class="col-lg-5 mb-4">
         <div class="card h-100">
             <div class="card-header">
-                <i class="bi bi-building me-2"></i>My Units
+                <i class="bi bi-building me-2"></i>Mis Unidades
             </div>
             <div class="card-body">
                 {% for user_unit in my_units %}
@@ -114,16 +114,16 @@
                     </div>
                     <div>
                         {% if user_unit.is_active %}
-                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Active</span>
+                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Activo</span>
                         {% else %}
-                            <span class="badge bg-secondary"><i class="bi bi-x-circle me-1"></i>Inactive</span>
+                            <span class="badge bg-secondary"><i class="bi bi-x-circle me-1"></i>Inactivo</span>
                         {% endif %}
                     </div>
                 </div>
                 {% empty %}
                 <div class="empty-state">
                     <i class="bi bi-building"></i>
-                    <p class="text-muted mb-0">No units assigned</p>
+                    <p class="text-muted mb-0">No tienes unidades asignadas</p>
                 </div>
                 {% endfor %}
             </div>
@@ -133,23 +133,23 @@
 
 <div class="card">
     <div class="card-header">
-        <i class="bi bi-check-all me-2"></i>Recent Approved Expenses
+        <i class="bi bi-check-all me-2"></i>Gastos Aprobados Recientes
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Vendor</th>
-                        <th>Category</th>
-                        <th class="text-end">Amount</th>
+                        <th>Fecha</th>
+                        <th>Proveedor</th>
+                        <th>Categoría</th>
+                        <th class="text-end">Monto</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for expense in recent_expenses %}
                     <tr>
-                        <td>{{ expense.date|date:"M d, Y" }}</td>
+                        <td>{{ expense.date|date:"d M, Y" }}</td>
                         <td>
                             <i class="bi bi-shop me-1 text-muted"></i>
                             {{ expense.vendor }}
@@ -164,7 +164,7 @@
                         <td colspan="4">
                             <div class="empty-state">
                                 <i class="bi bi-inbox"></i>
-                                <p class="mb-0">No approved expenses yet</p>
+                                <p class="mb-0">No hay gastos aprobados aún</p>
                             </div>
                         </td>
                     </tr>

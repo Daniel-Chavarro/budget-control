@@ -1,7 +1,10 @@
 """Storage service abstraction layer."""
 import io
+import logging
 from django.conf import settings
 from abc import ABC, abstractmethod
+
+logger = logging.getLogger(__name__)
 
 
 class BaseStorageService(ABC):
@@ -31,21 +34,27 @@ class GoogleDriveStorage(BaseStorageService):
             'GOOGLE_DRIVE_CREDENTIALS_FILE',
             None
         )
+        logger.debug(f"[GOOGLE DRIVE] Config file: {self.credentials_file}")
     
     def upload_file(self, file, filename):
         """Upload file to Google Drive."""
+        logger.debug(f"[GOOGLE DRIVE] Starting upload: {filename}")
+        
         try:
             from googleapiclient.discovery import build
             from googleapiclient.http import MediaIoBaseUpload
             from google.oauth2 import service_account
             
             SCOPES = ['https://www.googleapis.com/auth/drive.file']
+            
+            logger.debug("[GOOGLE DRIVE] Loading credentials...")
             credentials = service_account.Credentials.from_service_account_file(
                 self.credentials_file,
                 scopes=SCOPES
             )
             
             service = build('drive', 'v3', credentials=credentials)
+            logger.debug("[GOOGLE DRIVE] Building Drive service...")
             
             file_metadata = {'name': filename}
             
@@ -54,21 +63,28 @@ class GoogleDriveStorage(BaseStorageService):
             else:
                 file_content = file
             
+            logger.debug(f"[GOOGLE DRIVE] File content size: {len(file_content)} bytes")
+            
             media = MediaIoBaseUpload(
                 io.BytesIO(file_content),
                 mimetype='application/octet-stream',
                 resumable=True
             )
             
+            logger.debug("[GOOGLE DRIVE] Uploading file...")
             uploaded_file = service.files().create(
                 body=file_metadata,
                 media_body=media,
                 fields='id, webViewLink'
             ).execute()
             
-            return uploaded_file.get('webViewLink')
+            url = uploaded_file.get('webViewLink')
+            logger.info(f"[GOOGLE DRIVE] Upload successful: {url}")
+            
+            return url
             
         except Exception as e:
+            logger.error(f"[GOOGLE DRIVE] Upload failed: {str(e)}")
             raise Exception(f'Google Drive upload failed: {str(e)}')
     
     def _upload_to_drive(self, file, filename):
@@ -79,29 +95,47 @@ class GoogleDriveStorage(BaseStorageService):
 class CloudinaryStorage(BaseStorageService):
     """Cloudinary storage implementation."""
     
+    def __init__(self):
+        logger.debug(f"[CLOUDINARY] Configured")
+    
     def upload_file(self, file, filename):
         """Upload file to Cloudinary."""
+        logger.debug(f"[CLOUDINARY] Starting upload: {filename}")
+        
         try:
             import cloudinary
             import cloudinary.uploader
             
+            logger.debug("[CLOUDINARY] Configuring with CLOUDINARY_URL")
             cloudinary.config(cloudinary_url=settings.CLOUDINARY_URL)
             
+            if hasattr(file, 'read'):
+                file_content = file.read()
+                file.seek(0)
+            else:
+                file_content = file
+            
+            logger.debug(f"[CLOUDINARY] Uploading {len(file_content)} bytes...")
             result = cloudinary.uploader.upload(
-                file,
+                file_content,
                 public_id=filename,
                 resource_type='auto'
             )
             
-            return result.get('secure_url')
+            url = result.get('secure_url')
+            logger.info(f"[CLOUDINARY] Upload successful: {url}")
+            
+            return url
             
         except Exception as e:
+            logger.error(f"[CLOUDINARY] Upload failed: {str(e)}")
             raise Exception(f'Cloudinary upload failed: {str(e)}')
 
 
 def get_storage_service():
     """Factory function to get storage service based on settings."""
     provider = getattr(settings, 'STORAGE_PROVIDER', 'google_drive')
+    logger.debug(f"[STORAGE FACTORY] Creating storage service for provider: {provider}")
     
     if provider == 'google_drive':
         return GoogleDriveStorage()

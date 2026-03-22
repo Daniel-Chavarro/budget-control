@@ -5,7 +5,8 @@ from budget.views import receipt_upload_view, receipt_list_view
 from budget.views import pending_receipts_view, receipt_detail_view, all_receipts_view
 from budget.views.management import (
     unit_list_view, unit_create_view, unit_edit_view, unit_delete_view,
-    user_management_view, user_create_view, user_delete_view
+    user_management_view, user_create_view, user_delete_view,
+    category_list_view, category_create_view, category_edit_view, category_delete_view
 )
 from budget.views.reports import expense_report_view
 
@@ -29,4 +30,8 @@ urlpatterns = [
     path('review/<int:pk>/', receipt_detail_view, name='receipt_detail'),
     path('review/all/', all_receipts_view, name='all_receipts'),
     path('reports/expenses/', expense_report_view, name='expense_report'),
+    path('categories/', category_list_view, name='category_list'),
+    path('categories/create/', category_create_view, name='category_create'),
+    path('categories/<int:pk>/edit/', category_edit_view, name='category_edit'),
+    path('categories/<int:pk>/delete/', category_delete_view, name='category_delete'),
 ]

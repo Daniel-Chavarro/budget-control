@@ -3,6 +3,30 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class Category(models.Model):
+    """Expense/Income category."""
+    
+    TYPE_CHOICES = [
+        ('expense', 'Gasto'),
+        ('income', 'Ingreso'),
+    ]
+    
+    name = models.CharField(max_length=50, unique=True)
+    name_es = models.CharField('Nombre en espanol', max_length=50)
+    category_type = models.CharField(max_length=10, choices=TYPE_CHOICES)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'categories'
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
+        ordering = ['category_type', 'name']
+    
+    def __str__(self):
+        return f'{self.name_es}'
+
+
 class Receipt(models.Model):
     """Uploaded receipt record."""
     
@@ -10,6 +34,11 @@ class Receipt(models.Model):
         ('pending_review', 'Pending Review'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
+    ]
+    
+    RECEIPT_TYPE_CHOICES = [
+        ('income', 'Ingreso'),
+        ('expense', 'Gasto'),
     ]
     
     uploaded_by = models.ForeignKey(
@@ -20,6 +49,11 @@ class Receipt(models.Model):
     original_file_url = models.URLField(max_length=500)
     file_name = models.CharField(max_length=255)
     upload_timestamp = models.DateTimeField(auto_now_add=True)
+    receipt_type = models.CharField(
+        max_length=10,
+        choices=RECEIPT_TYPE_CHOICES,
+        default='expense'
+    )
     
     status = models.CharField(
         max_length=20,
@@ -66,12 +100,12 @@ class ExpenseData(models.Model):
     """Extracted/edited expense data from receipt."""
     
     CATEGORY_CHOICES = [
-        ('maintenance', 'Maintenance'),
-        ('utilities', 'Utilities'),
-        ('cleaning', 'Cleaning'),
-        ('security', 'Security'),
-        ('repairs', 'Repairs'),
-        ('other', 'Other'),
+        ('maintenance', 'Mantenimiento'),
+        ('utilities', 'Servicios'),
+        ('cleaning', 'Limpieza'),
+        ('security', 'Seguridad'),
+        ('repairs', 'Reparaciones'),
+        ('other', 'Otro'),
     ]
     
     receipt = models.OneToOneField(
@@ -83,7 +117,12 @@ class ExpenseData(models.Model):
     date = models.DateField()
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     vendor = models.CharField(max_length=200)
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.PROTECT,
+        limit_choices_to={'category_type': 'expense', 'is_active': True},
+        related_name='expenses'
+    )
     description = models.TextField(blank=True)
     modified_by_user = models.BooleanField(default=False)
     
@@ -94,3 +133,33 @@ class ExpenseData(models.Model):
     
     def __str__(self):
         return f'{self.vendor} - ${self.amount} ({self.date})'
+
+
+class IncomeData(models.Model):
+    """Extracted/edited income data from receipt."""
+    
+    receipt = models.OneToOneField(
+        Receipt,
+        on_delete=models.CASCADE,
+        related_name='income_data'
+    )
+    
+    date = models.DateField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payer = models.CharField(max_length=200, verbose_name='Pagador')
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.PROTECT,
+        limit_choices_to={'category_type': 'income', 'is_active': True},
+        related_name='incomes'
+    )
+    description = models.TextField(blank=True)
+    modified_by_user = models.BooleanField(default=False)
+    
+    class Meta:
+        db_table = 'income_data'
+        verbose_name = 'Income Data'
+        verbose_name_plural = 'Income Data'
+    
+    def __str__(self):
+        return f'{self.payer} - ${self.amount} ({self.date})'
