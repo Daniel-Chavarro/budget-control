@@ -52,18 +52,12 @@
                             {% endif %}
                         </td>
                         <td class="text-end">
-                            {% if receipt.receipt_type == 'income' %}
-                                <strong class="text-success">${{ receipt.income_data.amount|default:'0.00' }}</strong>
-                            {% else %}
-                                <strong class="text-danger">${{ receipt.expense_data.amount|default:'0.00' }}</strong>
-                            {% endif %}
+                            <strong class="{% if receipt.receipt_type == 'income' %}text-success{% else %}text-danger{% endif %}">
+                                ${{ receipt.amount|default:'0.00' }}
+                            </strong>
                         </td>
                         <td>
-                            {% if receipt.receipt_type == 'income' %}
-                                {{ receipt.income_data.payer|default:'-' }}
-                            {% else %}
-                                {{ receipt.expense_data.vendor|default:'-' }}
-                            {% endif %}
+                            {{ receipt.counterparty|default:'-' }}
                         </td>
                     </tr>
                     {% empty %}

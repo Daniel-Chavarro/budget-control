@@ -146,11 +146,9 @@
                                     {{ receipt.uploaded_by.username }}
                                 </td>
                                 <td>
-                                    {% if receipt.receipt_type == 'income' %}
-                                        <strong class="text-success">${{ receipt.income_data.amount|default:'0.00' }}</strong>
-                                    {% else %}
-                                        <strong class="text-danger">${{ receipt.expense_data.amount|default:'0.00' }}</strong>
-                                    {% endif %}
+                                    <strong class="{% if receipt.receipt_type == 'income' %}text-success{% else %}text-danger{% endif %}">
+                                        ${{ receipt.amount|default:'0.00' }}
+                                    </strong>
                                 </td>
                                 <td>
                                     <a href="{% url 'budget:receipt_detail' receipt.pk %}" class="btn btn-sm btn-primary">

@@ -195,7 +195,7 @@
                             {% for expense in expenses %}
                             <tr>
                                 <td>{{ expense.date|date:"d M, Y" }}</td>
-                                <td>{{ expense.vendor }}</td>
+                                <td>{{ expense.counterparty }}</td>
                                 <td class="text-end"><strong class="text-danger">${{ expense.amount }}</strong></td>
                             </tr>
                             {% empty %}
@@ -228,7 +228,7 @@
                             {% for income in incomes %}
                             <tr>
                                 <td>{{ income.date|date:"d M, Y" }}</td>
-                                <td>{{ income.payer }}</td>
+                                <td>{{ income.counterparty }}</td>
                                 <td class="text-end"><strong class="text-success">${{ income.amount }}</strong></td>
                             </tr>
                             {% empty %}

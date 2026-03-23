@@ -65,18 +65,18 @@
 </div>
 
 <div class="step-indicator mb-4">
-    <div class="step {% if not expense_form and not income_form %}active{% else %}completed{% endif %}">
+    <div class="step {% if not transaction_form %}active{% else %}completed{% endif %}">
         <span class="step-number">1</span>
         <span class="fw-medium">Subir Archivo</span>
     </div>
     <div class="flex-grow-1 border-top"></div>
-    <div class="step {% if expense_form or income_form %}active{% else %}inactive{% endif %}">
+    <div class="step {% if transaction_form %}active{% else %}inactive{% endif %}">
         <span class="step-number">2</span>
         <span class="fw-medium">Revisar y Enviar</span>
     </div>
 </div>
 
-{% if not expense_form and not income_form %}
+{% if not transaction_form %}
 <div class="row">
     <div class="col-lg-6 mx-auto">
         <div class="card">
@@ -117,7 +117,7 @@
         <div class="card mb-4">
             <div class="card-header">
                 <i class="bi bi-clipboard-check me-2"></i>Paso 2: Revisar y Enviar
-                {% if income_form %}
+                {% if receipt_type_display == 'income' %}
                     <span class="badge bg-success ms-2">Ingreso</span>
                 {% else %}
                     <span class="badge bg-danger ms-2">Gasto</span>
@@ -127,22 +127,20 @@
                 <form method="post" id="receipt-form">
                     {% csrf_token %}
                     <div class="row">
-                        {% with form=expense_form|default:income_form %}
-                            {% for field in form %}
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-medium">
-                                        {{ field.label }}
-                                        {% if field.field.required %}
-                                            <span class="text-danger">*</span>
-                                        {% endif %}
-                                    </label>
-                                    {{ field }}
-                                    {% if field.errors %}
-                                        <div class="text-danger small mt-1">{{ field.errors }}</div>
+                        {% for field in transaction_form %}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-medium">
+                                    {{ field.label }}
+                                    {% if field.field.required %}
+                                        <span class="text-danger">*</span>
                                     {% endif %}
-                                </div>
-                            {% endfor %}
-                        {% endwith %}
+                                </label>
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="text-danger small mt-1">{{ field.errors }}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
                     </div>
                     <div class="d-flex gap-2">
                         <button type="submit" name="submit_receipt" class="btn btn-success">

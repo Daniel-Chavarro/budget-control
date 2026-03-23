@@ -1,6 +1,6 @@
 """Receipt-related forms."""
 from django import forms
-from budget.models import Receipt, ExpenseData, IncomeData, Category
+from budget.models import Receipt, Category
 from django.contrib.auth.models import User
 
 
@@ -20,7 +20,8 @@ class ReceiptUploadForm(forms.Form):
         label='Tipo de comprobante',
         choices=Receipt.RECEIPT_TYPE_CHOICES,
         widget=forms.Select(attrs={'class': 'form-select'}),
-        initial='expense'
+        initial='expense',
+        required=False
     )
     
     upload_as_user = forms.ModelChoiceField(
@@ -29,6 +30,10 @@ class ReceiptUploadForm(forms.Form):
         widget=forms.Select(attrs={'class': 'form-select'}),
         help_text='Solo admin: Subir a nombre de otro usuario'
     )
+    
+    def clean_receipt_type(self):
+        """Return default if not provided."""
+        return self.cleaned_data.get('receipt_type') or 'income'
     
     def clean_receipt_file(self):
         """Validate file size and type."""
@@ -55,54 +60,30 @@ def get_category_by_name_es(name: str, category_type: str = 'expense'):
         return None
 
 
-class ExpenseDataForm(forms.ModelForm):
-    """Form for editing expense data extracted from OCR."""
+class TransactionForm(forms.ModelForm):
+    """Unified form for transaction data (income or expense)."""
     
-    def __init__(self, *args, category_type='expense', **kwargs):
+    def __init__(self, *args, receipt_type='expense', **kwargs):
         super().__init__(*args, **kwargs)
+        self.receipt_type = receipt_type
         self.fields['category'].queryset = Category.objects.filter(
-            category_type=category_type,
+            category_type=receipt_type,
             is_active=True
         ).order_by('name_es')
         self.fields['category'].empty_label = 'Seleccionar categoria'
+        
+        if receipt_type == 'expense':
+            self.fields['counterparty'].label = 'Proveedor'
+        else:
+            self.fields['counterparty'].label = 'Pagador'
     
     class Meta:
-        model = ExpenseData
-        fields = ['date', 'amount', 'vendor', 'category', 'description']
+        model = Receipt
+        fields = ['date', 'amount', 'counterparty', 'category', 'description']
         widgets = {
             'date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
-            'vendor': forms.TextInput(attrs={'class': 'form-control'}),
-            'category': forms.Select(attrs={'class': 'form-select'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-        }
-    
-    def clean_amount(self):
-        """Validate amount is positive."""
-        amount = self.cleaned_data.get('amount')
-        if amount and amount <= 0:
-            raise forms.ValidationError('El monto debe ser positivo.')
-        return amount
-
-
-class IncomeDataForm(forms.ModelForm):
-    """Form for editing income data extracted from receipt."""
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['category'].queryset = Category.objects.filter(
-            category_type='income',
-            is_active=True
-        ).order_by('name_es')
-        self.fields['category'].empty_label = 'Seleccionar categoria'
-    
-    class Meta:
-        model = IncomeData
-        fields = ['date', 'amount', 'payer', 'category', 'description']
-        widgets = {
-            'date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
-            'payer': forms.TextInput(attrs={'class': 'form-control'}),
+            'counterparty': forms.TextInput(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'form-select'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }

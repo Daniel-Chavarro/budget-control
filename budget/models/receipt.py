@@ -70,6 +70,19 @@ class Receipt(models.Model):
     )
     review_timestamp = models.DateTimeField(null=True, blank=True)
     review_notes = models.TextField(blank=True)
+
+    date = models.DateField(null=True, blank=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    counterparty = models.CharField(max_length=200, blank=True, help_text="Vendor for expenses, payer for income")
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name='transactions'
+    )
+    description = models.TextField(blank=True)
+    modified_by_user = models.BooleanField(default=False)
     
     class Meta:
         db_table = 'receipts'
@@ -94,72 +107,3 @@ class Receipt(models.Model):
     def is_rejected(self):
         """Check if receipt is rejected."""
         return self.status == 'rejected'
-
-
-class ExpenseData(models.Model):
-    """Extracted/edited expense data from receipt."""
-    
-    CATEGORY_CHOICES = [
-        ('maintenance', 'Mantenimiento'),
-        ('utilities', 'Servicios'),
-        ('cleaning', 'Limpieza'),
-        ('security', 'Seguridad'),
-        ('repairs', 'Reparaciones'),
-        ('other', 'Otro'),
-    ]
-    
-    receipt = models.OneToOneField(
-        Receipt,
-        on_delete=models.CASCADE,
-        related_name='expense_data'
-    )
-    
-    date = models.DateField()
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    vendor = models.CharField(max_length=200)
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.PROTECT,
-        limit_choices_to={'category_type': 'expense', 'is_active': True},
-        related_name='expenses'
-    )
-    description = models.TextField(blank=True)
-    modified_by_user = models.BooleanField(default=False)
-    
-    class Meta:
-        db_table = 'expense_data'
-        verbose_name = 'Expense Data'
-        verbose_name_plural = 'Expense Data'
-    
-    def __str__(self):
-        return f'{self.vendor} - ${self.amount} ({self.date})'
-
-
-class IncomeData(models.Model):
-    """Extracted/edited income data from receipt."""
-    
-    receipt = models.OneToOneField(
-        Receipt,
-        on_delete=models.CASCADE,
-        related_name='income_data'
-    )
-    
-    date = models.DateField()
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    payer = models.CharField(max_length=200, verbose_name='Pagador')
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.PROTECT,
-        limit_choices_to={'category_type': 'income', 'is_active': True},
-        related_name='incomes'
-    )
-    description = models.TextField(blank=True)
-    modified_by_user = models.BooleanField(default=False)
-    
-    class Meta:
-        db_table = 'income_data'
-        verbose_name = 'Income Data'
-        verbose_name_plural = 'Income Data'
-    
-    def __str__(self):
-        return f'{self.payer} - ${self.amount} ({self.date})'

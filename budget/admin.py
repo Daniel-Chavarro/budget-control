@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from budget.models import Unit, UserProfile, UserUnit, Receipt, ExpenseData
+from budget.models import Unit, UserProfile, UserUnit, Receipt
 
 
 class UserProfileInline(admin.StackedInline):
@@ -59,25 +59,10 @@ class UserUnitAdmin(admin.ModelAdmin):
     date_hierarchy = 'start_date'
 
 
-class ExpenseDataInline(admin.StackedInline):
-    """Inline expense data for receipt."""
-    model = ExpenseData
-    can_delete = False
-
-
 @admin.register(Receipt)
 class ReceiptAdmin(admin.ModelAdmin):
     """Admin for receipts."""
-    list_display = ['file_name', 'uploaded_by', 'status', 'upload_timestamp']
-    list_filter = ['status', 'upload_timestamp']
-    search_fields = ['file_name', 'uploaded_by__username']
-    inlines = [ExpenseDataInline]
+    list_display = ['file_name', 'uploaded_by', 'receipt_type', 'status', 'amount', 'counterparty', 'upload_timestamp']
+    list_filter = ['status', 'receipt_type', 'upload_timestamp']
+    search_fields = ['file_name', 'uploaded_by__username', 'counterparty']
     readonly_fields = ['upload_timestamp', 'review_timestamp']
-
-
-@admin.register(ExpenseData)
-class ExpenseDataAdmin(admin.ModelAdmin):
-    """Admin for expense data."""
-    list_display = ['receipt', 'vendor', 'amount', 'date', 'category']
-    list_filter = ['category', 'date']
-    search_fields = ['vendor', 'description']

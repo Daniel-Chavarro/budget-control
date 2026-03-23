@@ -4,8 +4,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
 from budget.decorators import admin_required
-from budget.models import Receipt, ExpenseData
-from budget.forms import ExpenseDataForm
+from budget.models import Receipt
+from budget.forms import TransactionForm
 
 logger = logging.getLogger(__name__)
 
@@ -26,28 +26,21 @@ def receipt_detail_view(request, pk):
     receipt = get_object_or_404(Receipt, pk=pk)
     logger.debug(f"[REVIEW] Admin {request.user} viewing receipt detail: {receipt.file_name}")
     
-    try:
-        expense_data = receipt.expense_data
-    except ExpenseData.DoesNotExist:
-        expense_data = None
-    
     if request.method == 'POST':
         action = request.POST.get('action')
         logger.debug(f"[REVIEW] Action received: {action} for receipt {receipt.id}")
         
         if action == 'approve':
-            if expense_data:
-                form = ExpenseDataForm(request.POST, instance=expense_data)
-            else:
-                form = ExpenseDataForm(request.POST)
+            form = TransactionForm(request.POST, instance=receipt, receipt_type=receipt.receipt_type)
             
             if form.is_valid():
-                expense = form.save(commit=False)
-                if not expense_data:
-                    expense.receipt = receipt
-                expense.modified_by_user = True
-                expense.save()
-                logger.info(f"[REVIEW] Expense data updated: vendor={expense.vendor}, amount={expense.amount}")
+                transaction = form.save(commit=False)
+                receipt.date = transaction.date
+                receipt.amount = transaction.amount
+                receipt.counterparty = transaction.counterparty
+                receipt.category = transaction.category
+                receipt.description = transaction.description
+                receipt.modified_by_user = True
                 
                 receipt.status = 'approved'
                 receipt.reviewed_by = request.user
@@ -56,7 +49,7 @@ def receipt_detail_view(request, pk):
                 receipt.save()
                 
                 logger.info(f"[REVIEW] Receipt {receipt.id} APPROVED by {request.user}")
-                messages.success(request, f'Receipt {receipt.file_name} approved.')
+                messages.success(request, f'Recibo {receipt.file_name} aprobado.')
                 return redirect('budget:pending_receipts')
         
         elif action == 'reject':
@@ -65,7 +58,7 @@ def receipt_detail_view(request, pk):
             
             if not notes:
                 logger.warning(f"[REVIEW] Rejection rejected - no notes provided")
-                messages.error(request, 'Rejection notes are required.')
+                messages.error(request, 'Notas de rechazo son requeridas.')
             else:
                 receipt.status = 'rejected'
                 receipt.reviewed_by = request.user
@@ -74,17 +67,14 @@ def receipt_detail_view(request, pk):
                 receipt.save()
                 
                 logger.info(f"[REVIEW] Receipt {receipt.id} REJECTED by {request.user}")
-                messages.success(request, f'Receipt {receipt.file_name} rejected.')
+                messages.success(request, f'Recibo {receipt.file_name} rechazado.')
                 return redirect('budget:pending_receipts')
     
-    if expense_data:
-        expense_form = ExpenseDataForm(instance=expense_data)
-    else:
-        expense_form = ExpenseDataForm()
+    form = TransactionForm(instance=receipt, receipt_type=receipt.receipt_type)
     
     context = {
         'receipt': receipt,
-        'expense_form': expense_form,
+        'transaction_form': form,
     }
     
     return render(request, 'budget/review/detail.html', context)

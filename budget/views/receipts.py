@@ -1,16 +1,14 @@
 """Receipt upload and management views."""
-import os
 import base64
-import tempfile
 import logging
 
 from PIL import Image
-from django.shortcuts import render, redirect, get_object_or_404
+from django import forms
+from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from budget.decorators import any_authenticated_user
-from budget.models import Receipt, ExpenseData, IncomeData
-from budget.forms import ReceiptUploadForm, ExpenseDataForm, IncomeDataForm, get_category_by_name_es
+from budget.models import Receipt
+from budget.forms import ReceiptUploadForm, TransactionForm, get_category_by_name_es
 from budget.services import get_storage_service, get_ocr_service
 from datetime import datetime
 
@@ -22,11 +20,9 @@ def receipt_upload_view(request):
     """Upload receipt with OCR processing - transactional upload."""
     is_admin = request.user.userprofile.is_admin
     upload_form = ReceiptUploadForm()
-    expense_form = None
-    income_form = None
+    transaction_form = None
     receipt_url = None
     ocr_data = None
-    receipt_type = 'expense'
     
     if request.method == 'POST':
         if 'receipt_file' in request.FILES:
@@ -68,7 +64,7 @@ def receipt_upload_view(request):
                 ocr_service = get_ocr_service()
                 logger.debug(f"[RECEIPT UPLOAD] OCR provider: {type(ocr_service).__name__}")
 
-                ocr_data = ocr_service.extract_receipt_data(    image)
+                ocr_data = ocr_service.extract_receipt_data(image)
                 logger.info(f"[RECEIPT UPLOAD] OCR extracted data: {ocr_data}")
                 
                 description = ocr_data.get('description') or ''
@@ -79,20 +75,18 @@ def receipt_upload_view(request):
                 category_obj = get_category_by_name_es(category_name, receipt_type)
                 category_id = category_obj.id if category_obj else None
                 
+                counterparty = ocr_data.get('vendor') or ''
+                
                 initial_data = {
                     'date': ocr_data.get('date') or datetime.now().date(),
                     'amount': ocr_data.get('amount') or '0.00',
-                    'vendor': ocr_data.get('vendor') or '',
-                    'payer': ocr_data.get('vendor') or '',
+                    'counterparty': counterparty,
                     'category': category_id,
                     'description': description,
                 }
                 logger.debug(f"[RECEIPT UPLOAD] Initial form data: {initial_data}")
                 
-                if receipt_type == 'income':
-                    income_form = IncomeDataForm(initial=initial_data)
-                else:
-                    expense_form = ExpenseDataForm(initial=initial_data, category_type=receipt_type)
+                transaction_form = TransactionForm(initial=initial_data, receipt_type=receipt_type)
                 
                 request.session['pending_receipt'] = {
                     'file_content': base64.b64encode(file_content).decode('utf-8'),
@@ -109,16 +103,15 @@ def receipt_upload_view(request):
             logger.debug(f"[RECEIPT SUBMIT] User {request.user} submitting receipt")
             
             pending_data = request.session.get('pending_receipt')
-            receipt_type = pending_data.get('receipt_type', 'expense') if pending_data else 'expense'
-            
-            if receipt_type == 'income':
-                income_form = IncomeDataForm(request.POST)
-                data_form = income_form
+            if not is_admin:
+                receipt_type = 'income'
             else:
-                expense_form = ExpenseDataForm(request.POST, category_type=receipt_type)
-                data_form = expense_form
+                receipt_type = pending_data.get('receipt_type', 'expense') if pending_data else 'expense'
             
-            if data_form.is_valid():
+            receipt = Receipt()
+            transaction_form = TransactionForm(request.POST, instance=receipt, receipt_type=receipt_type)
+            
+            if transaction_form.is_valid():
                 pending_data = request.session.get('pending_receipt')
                 logger.debug(f"[RECEIPT SUBMIT] Pending data from session: {pending_data}")
                 
@@ -146,14 +139,18 @@ def receipt_upload_view(request):
                     )
                     logger.info(f"[RECEIPT SUBMIT] Receipt created: id={receipt.id}, file={receipt.file_name}, type={receipt_type}")
                     
-                    data = data_form.save(commit=False)
-                    data.receipt = receipt
-                    data.save()
+                    transaction = transaction_form.save(commit=False)
+                    transaction.id = receipt.id
+                    transaction.modified_by_user = True
+                    receipt.date = transaction.date
+                    receipt.amount = transaction.amount
+                    receipt.counterparty = transaction.counterparty
+                    receipt.category = transaction.category
+                    receipt.description = transaction.description
+                    receipt.modified_by_user = True
+                    receipt.save()
                     
-                    if receipt_type == 'income':
-                        logger.info(f"[RECEIPT SUBMIT] Income data saved: payer={data.payer}, amount={data.amount}")
-                    else:
-                        logger.info(f"[RECEIPT SUBMIT] Expense data saved: vendor={data.vendor}, amount={data.amount}")
+                    logger.info(f"[RECEIPT SUBMIT] Transaction data saved: counterparty={transaction.counterparty}, amount={transaction.amount}")
                     
                     del request.session['pending_receipt']
                     logger.debug("[RECEIPT SUBMIT] Session cleared")
@@ -176,16 +173,21 @@ def receipt_upload_view(request):
     
     if not is_admin:
         upload_form.fields.pop('upload_as_user', None)
-        upload_form.fields['receipt_type'].widget.attrs['readonly'] = True
-        upload_form.fields['receipt_type'].widget.attrs['class'] += ' bg-secondary text-white'
+        upload_form.fields['receipt_type'].widget = forms.HiddenInput()
+        upload_form.initial['receipt_type'] = 'income'
+    
+    receipt_type_display = 'income'
+    if is_admin:
+        pending_data = request.session.get('pending_receipt')
+        receipt_type_display = pending_data.get('receipt_type', 'expense') if pending_data else 'expense'
     
     context = {
         'upload_form': upload_form,
-        'expense_form': expense_form,
-        'income_form': income_form,
+        'transaction_form': transaction_form,
         'receipt_url': receipt_url,
         'ocr_data': ocr_data,
         'has_pending': bool(pending_data),
+        'receipt_type_display': receipt_type_display,
     }
     
     return render(request, 'budget/receipts/upload.html', context)
@@ -195,8 +197,8 @@ def receipt_upload_view(request):
 def receipt_list_view(request):
     """List user's uploaded receipts."""
     if request.user.userprofile.is_admin:
-        receipts = Receipt.objects.all().select_related('expense_data', 'income_data')
+        receipts = Receipt.objects.all()
     else:
-        receipts = Receipt.objects.filter(uploaded_by=request.user).select_related('expense_data', 'income_data')
+        receipts = Receipt.objects.filter(uploaded_by=request.user)
     
     return render(request, 'budget/receipts/list.html', {'receipts': receipts})

@@ -1,6 +1,7 @@
 """Storage service abstraction layer."""
 import io
 import logging
+from datetime import datetime
 from django.conf import settings
 from abc import ABC, abstractmethod
 
@@ -34,7 +35,57 @@ class GoogleDriveStorage(BaseStorageService):
             'GOOGLE_DRIVE_CREDENTIALS_FILE',
             None
         )
+        self.folder_id_cache = {}
         logger.debug(f"[GOOGLE DRIVE] Config file: {self.credentials_file}")
+    
+    def _get_or_create_folder(self, service, parent_id, folder_name):
+        """Get existing folder ID or create new one."""
+        if folder_name in self.folder_id_cache.get(parent_id, {}):
+            return self.folder_id_cache[parent_id][folder_name]
+        
+        query = f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder'"
+        if parent_id:
+            query += f" and '{parent_id}' in parents"
+        
+        results = service.files().list(q=query, fields='files(id, name)').execute()
+        files = results.get('files', [])
+        
+        if files:
+            folder_id = files[0]['id']
+            logger.debug(f"[GOOGLE DRIVE] Found folder: {folder_name} -> {folder_id}")
+        else:
+            folder_metadata = {
+                'name': folder_name,
+                'mimeType': 'application/vnd.google-apps.folder'
+            }
+            if parent_id:
+                folder_metadata['parents'] = [parent_id]
+            
+            folder = service.files().create(folder_metadata, fields='id').execute()
+            folder_id = folder['id']
+            logger.info(f"[GOOGLE DRIVE] Created folder: {folder_name} -> {folder_id}")
+        
+        if parent_id not in self.folder_id_cache:
+            self.folder_id_cache[parent_id] = {}
+        self.folder_id_cache[parent_id][folder_name] = folder_id
+        
+        return folder_id
+    
+    def _get_year_month_folders(self, service, parent_id=None):
+        """Get or create year and month folders."""
+        now = datetime.now()
+        year_name = str(now.year)
+        month_name = now.strftime('%m-%B')
+        
+        if parent_id:
+            root_id = parent_id
+        else:
+            root_id = self._get_or_create_folder(service, None, 'BudgetControl receipts')
+        
+        year_id = self._get_or_create_folder(service, root_id, year_name)
+        month_id = self._get_or_create_folder(service, year_id, month_name)
+        
+        return month_id
     
     def upload_file(self, file, filename):
         """Upload file to Google Drive."""
@@ -56,7 +107,14 @@ class GoogleDriveStorage(BaseStorageService):
             service = build('drive', 'v3', credentials=credentials)
             logger.debug("[GOOGLE DRIVE] Building Drive service...")
             
-            file_metadata = {'name': filename}
+            parent_folder_id = getattr(settings, 'GOOGLE_DRIVE_PARENT_FOLDER_ID', None)
+            folder_id = self._get_year_month_folders(service, parent_folder_id)
+            logger.debug(f"[GOOGLE DRIVE] Target folder: {folder_id}")
+            
+            file_metadata = {
+                'name': filename,
+                'parents': [folder_id]
+            }
             
             if hasattr(file, 'read'):
                 file_content = file.read()
@@ -96,7 +154,13 @@ class CloudinaryStorage(BaseStorageService):
     """Cloudinary storage implementation."""
     
     def __init__(self):
-        logger.debug(f"[CLOUDINARY] Configured")
+        self.folder_prefix = getattr(settings, 'CLOUDINARY_FOLDER_PREFIX', 'budget_control')
+        logger.debug(f"[CLOUDINARY] Configured with prefix: {self.folder_prefix}")
+    
+    def _get_folder_path(self):
+        """Get year/month folder path."""
+        now = datetime.now()
+        return f"{self.folder_prefix}/{now.year}/{now.strftime('%m-%B')}"
     
     def upload_file(self, file, filename):
         """Upload file to Cloudinary."""
@@ -109,6 +173,9 @@ class CloudinaryStorage(BaseStorageService):
             logger.debug("[CLOUDINARY] Configuring with CLOUDINARY_URL")
             cloudinary.config(cloudinary_url=settings.CLOUDINARY_URL)
             
+            folder_path = self._get_folder_path()
+            logger.debug(f"[CLOUDINARY] Target folder: {folder_path}")
+            
             if hasattr(file, 'read'):
                 file_content = file.read()
                 file.seek(0)
@@ -119,6 +186,7 @@ class CloudinaryStorage(BaseStorageService):
             result = cloudinary.uploader.upload(
                 file_content,
                 public_id=filename,
+                folder=folder_path,
                 resource_type='auto'
             )
             

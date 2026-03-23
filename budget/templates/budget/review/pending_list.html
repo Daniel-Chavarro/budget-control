@@ -16,8 +16,9 @@
                     <tr>
                         <th>Fecha de Upload</th>
                         <th>Nombre del Archivo</th>
+                        <th>Tipo</th>
                         <th>Subido Por</th>
-                        <th>Proveedor</th>
+                        <th>Proveedor/Pagador</th>
                         <th>Monto</th>
                         <th>Acciones</th>
                     </tr>
@@ -31,11 +32,18 @@
                             {{ receipt.file_name|truncatechars:25 }}
                         </td>
                         <td>
+                            {% if receipt.receipt_type == 'income' %}
+                                <span class="badge bg-success">Ingreso</span>
+                            {% else %}
+                                <span class="badge bg-danger">Gasto</span>
+                            {% endif %}
+                        </td>
+                        <td>
                             <i class="bi bi-person me-1 text-muted"></i>
                             {{ receipt.uploaded_by.username }}
                         </td>
-                        <td>{{ receipt.expense_data.vendor|default:'-' }}</td>
-                        <td><strong>${{ receipt.expense_data.amount|default:'0.00' }}</strong></td>
+                        <td>{{ receipt.counterparty|default:'-' }}</td>
+                        <td><strong>${{ receipt.amount|default:'0.00' }}</strong></td>
                         <td>
                             <a href="{% url 'budget:receipt_detail' receipt.pk %}" class="btn btn-sm btn-primary">
                                 <i class="bi bi-eye me-1"></i>Revisar

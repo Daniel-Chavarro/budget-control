@@ -2,9 +2,9 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.db.models import Sum, Count, Q
-from budget.models import Receipt, ExpenseData, IncomeData, UserUnit
-from datetime import datetime, timedelta
+from django.db.models import Sum, Count
+from budget.models import Receipt, UserUnit
+from datetime import datetime
 
 
 @login_required
@@ -24,30 +24,33 @@ def tenant_dashboard(request):
     this_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     this_year_start = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
     
-    month_total = IncomeData.objects.filter(
-        receipt__status='approved',
-        receipt__uploaded_by=user,
+    month_total = Receipt.objects.filter(
+        status='approved',
+        receipt_type='income',
+        uploaded_by=user,
         date__gte=this_month_start
     ).aggregate(total=Sum('amount'))['total'] or 0
     
-    year_total = IncomeData.objects.filter(
-        receipt__status='approved',
-        receipt__uploaded_by=user,
+    year_total = Receipt.objects.filter(
+        status='approved',
+        receipt_type='income',
+        uploaded_by=user,
         date__gte=this_year_start
     ).aggregate(total=Sum('amount'))['total'] or 0
     
     my_receipts = Receipt.objects.filter(
         uploaded_by=user
-    ).select_related('expense_data', 'income_data').order_by('-upload_timestamp')[:10]
+    ).order_by('-upload_timestamp')[:10]
     
     my_units = UserUnit.objects.filter(
         user=user
     ).select_related('unit')
     
-    recent_incomes = IncomeData.objects.filter(
-        receipt__status='approved',
-        receipt__uploaded_by=user
-    ).select_related('receipt').order_by('-date')[:10]
+    recent_incomes = Receipt.objects.filter(
+        status='approved',
+        receipt_type='income',
+        uploaded_by=user
+    ).order_by('-date')[:10]
     
     context = {
         'month_total': month_total,
@@ -70,35 +73,39 @@ def admin_dashboard(request):
     now = datetime.now()
     this_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     
-    month_expenses = ExpenseData.objects.filter(
-        receipt__status='approved',
+    month_expenses = Receipt.objects.filter(
+        status='approved',
+        receipt_type='expense',
         date__gte=this_month_start
     ).aggregate(total=Sum('amount'))['total'] or 0
     
-    month_incomes = IncomeData.objects.filter(
-        receipt__status='approved',
+    month_incomes = Receipt.objects.filter(
+        status='approved',
+        receipt_type='income',
         date__gte=this_month_start
     ).aggregate(total=Sum('amount'))['total'] or 0
     
-    expense_category_breakdown = ExpenseData.objects.filter(
-        receipt__status='approved'
+    expense_category_breakdown = Receipt.objects.filter(
+        status='approved',
+        receipt_type='expense'
     ).values('category__name', 'category__name_es').annotate(
         total=Sum('amount'),
         count=Count('id')
     ).order_by('-total')
     
-    income_category_breakdown = IncomeData.objects.filter(
-        receipt__status='approved'
+    income_category_breakdown = Receipt.objects.filter(
+        status='approved',
+        receipt_type='income'
     ).values('category__name', 'category__name_es').annotate(
         total=Sum('amount'),
         count=Count('id')
     ).order_by('-total')
     
-    recent_receipts = Receipt.objects.all().select_related('expense_data', 'income_data').order_by('-upload_timestamp')[:10]
+    recent_receipts = Receipt.objects.all().order_by('-upload_timestamp')[:10]
     
     pending_receipts = Receipt.objects.filter(
         status='pending_review'
-    ).select_related('uploaded_by', 'expense_data', 'income_data')[:5]
+    ).select_related('uploaded_by')[:5]
     
     context = {
         'pending_count': pending_count,
