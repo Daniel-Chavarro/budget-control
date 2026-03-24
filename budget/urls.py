@@ -8,6 +8,7 @@ from budget.views.management import (
     category_list_view, category_create_view, category_edit_view, category_delete_view
 )
 from budget.views.reports import expense_report_view
+from budget.views.account import account_settings_view
 
 app_name = 'budget'
 
@@ -16,6 +17,7 @@ urlpatterns = [
     path('register/', register_view, name='register'),
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
+    path('account/', account_settings_view, name='account_settings'),
     path('users/', user_management_view, name='user_management'),
     path('users/create/', user_create_view, name='user_create'),
     path('users/<int:pk>/delete/', user_delete_view, name='user_delete'),
