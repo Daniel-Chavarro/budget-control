@@ -36,16 +36,22 @@ Remove all code and data related to Unit and UserUnit models. This feature is cu
 | Model imports | `budget/models/__init__.py` | Remove Unit, UserUnit imports |
 | URLs | `budget/urls.py` | Remove unit-related paths |
 | Views | `budget/views/management.py` | Remove unit_list_view, unit_create_view, unit_edit_view, unit_delete_view |
-| Templates | `budget/templates/budget/management/unit_*.html` | Delete unit templates |
+| Templates | `budget/templates/budget/management/unit_list.html`, `budget/templates/budget/management/unit_form.html` | Delete unit templates |
 | Admin | `budget/admin.py` | Remove unit registrations |
 | Navigation | `budget/templates/budget/base.html` | Remove unit links |
-| Context | `budget/context_processors.py` | Remove unit-related context |
+| Context | `budget/context_processors.py` | No changes needed - no unit-related context exists |
 
 ### 2.3 Database
 
-Create a Django migration to:
-- Remove the `user_units` table
-- Remove the `units` table
+Create Django migrations to:
+1. First: Remove the `user_units` table (UserUnit depends on Unit)
+2. Then: Remove the `units` table
+
+**Migration order is critical** - UserUnit has ForeignKey to Unit, so:
+- Migration 1: Remove `user_units` table
+- Migration 2: Remove `units` table
+
+No other data depends on Units (Receipts don't link to Units).
 
 ---
 
