@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Sum, Count
-from budget.models import Receipt, UserUnit
+from budget.models import Receipt
 from datetime import datetime
 
 
@@ -42,10 +42,6 @@ def tenant_dashboard(request):
         uploaded_by=user
     ).order_by('-upload_timestamp')[:10]
     
-    my_units = UserUnit.objects.filter(
-        user=user
-    ).select_related('unit')
-    
     recent_incomes = Receipt.objects.filter(
         status='approved',
         receipt_type='income',
@@ -56,7 +52,6 @@ def tenant_dashboard(request):
         'month_total': month_total,
         'year_total': year_total,
         'my_receipts': my_receipts,
-        'my_units': my_units,
         'recent_incomes': recent_incomes,
     }
     
