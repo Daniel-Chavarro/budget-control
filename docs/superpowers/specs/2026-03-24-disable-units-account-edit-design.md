@@ -12,6 +12,14 @@ Two changes to the Budget Control app:
 1. Disable (remove) the Units feature entirely
 2. Add account editing capability for users to modify their own data
 
+### 1.1 Scope Note
+
+These two changes are combined in one spec because:
+- Both are small, related changes to simplify the app
+- Units removal is a cleanup task (no new feature)
+- Account editing is the new feature
+- They can be implemented in sequence within a single plan
+
 ---
 
 ## 2. Disable Units Feature
@@ -66,6 +74,13 @@ Allow users to edit their own account data: username, email, phone, and password
 | Template | `budget/templates/budget/account/account_settings.html` | New account settings page |
 | Navigation | `budget/templates/budget/base.html` | Add "Account" link to nav |
 
+### 3.3.1 UserProfile Integration
+
+The view will access UserProfile via `request.user.userprofile` (one-to-one relationship). When updating phone:
+1. Get `userprofile = request.user.userprofile`
+2. Update `userprofile.phone = form.cleaned_data['phone']`
+3. Save with `userprofile.save()`
+
 ### 3.4 Form Fields
 
 The account settings form will include:
@@ -77,15 +92,29 @@ The account settings form will include:
 ### 3.5 Validation Rules
 
 - Username: required, unique, max 150 chars
-- Email: required, valid format, unique
+- Email: required, valid format, unique (excluding current user)
 - Phone: optional, max 20 chars
-- Password: must match current password to change, min 8 chars
+- Password: must match current password to change, min 8 chars, max 128 chars
 
-### 3.6 Security
+### 3.6 Edge Cases
+
+- **Duplicate username/email**: Form validation error "A user with that username/email already exists"
+- **New password same as current**: Form validation error "New password must be different from current password"
+- **Phone blank**: Allow empty string, save as blank to UserProfile
+
+### 3.7 Security
 
 - Users can only edit their own account (request.user)
 - Password change requires current password verification
 - Email uniqueness check excludes current user
+- After password change: call `update_session_auth_hash(request, user)` to maintain session
+
+### 3.8 Session Handling
+
+After password change, the user should stay logged in:
+1. Call `user.set_password(new_password)`
+2. Call `user.save()`
+3. Call `update_session_auth_hash(request, user)` to refresh session
 
 ---
 
@@ -169,10 +198,34 @@ Add "Account" link in the navigation bar (next to Logout):
 ## 7. Testing
 
 ### Unit Tests
-- Account form validation
-- Password change verification
+
+**AccountForm:**
+- Valid data passes validation
+- Empty username fails validation
+- Empty email fails validation
+- Invalid email format fails validation
+- Duplicate username fails validation (excluding current user)
+- Duplicate email fails validation (excluding current user)
+- Valid phone passes validation
+- Empty phone passes validation
+
+**PasswordChangeForm:**
+- Wrong current password fails validation
+- New password same as current fails validation
+- Passwords not matching fails validation
+- Password too short fails validation
+- Valid password change passes validation
+
+### View Tests
+- GET /account/ returns 200 for authenticated users
+- GET /account/ redirects to login for anonymous users
+- POST with valid data updates user and shows success
+- POST with invalid data shows errors
+- Password change updates password correctly
+- User cannot modify another user's account
 
 ### Manual Tests
 - Edit own account data
 - Try to change password with wrong current password
 - Verify changes persist after logout/login
+- Verify still logged in after password change
