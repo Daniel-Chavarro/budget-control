@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from budget.models import Unit, UserProfile, UserUnit, Receipt
+from budget.models import UserProfile, Receipt
 
 
 class UserProfileInline(admin.StackedInline):
@@ -38,25 +38,6 @@ class UserProfileAdmin(admin.ModelAdmin):
     list_filter = ['role', 'created_at']
     search_fields = ['user__username', 'user__email', 'phone']
     readonly_fields = ['created_at', 'updated_at']
-
-
-@admin.register(Unit)
-class UnitAdmin(admin.ModelAdmin):
-    """Admin interface for Unit."""
-    list_display = ['identifier', 'type', 'status', 'monthly_fee', 'created_at']
-    list_filter = ['type', 'status', 'created_at']
-    search_fields = ['identifier']
-    readonly_fields = ['created_at', 'updated_at']
-
-
-@admin.register(UserUnit)
-class UserUnitAdmin(admin.ModelAdmin):
-    """Admin interface for UserUnit."""
-    list_display = ['user', 'unit', 'role_in_unit', 'start_date', 'end_date', 'is_active']
-    list_filter = ['role_in_unit', 'start_date']
-    search_fields = ['user__username', 'unit__identifier']
-    readonly_fields = ['created_at', 'updated_at']
-    date_hierarchy = 'start_date'
 
 
 @admin.register(Receipt)
