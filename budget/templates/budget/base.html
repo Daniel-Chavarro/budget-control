@@ -386,11 +386,6 @@
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated and user.userprofile.is_admin %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'budget:unit_list' %}">
-                                <i class="bi bi-building"></i>Unidades
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" href="{% url 'budget:user_management' %}">
                                 <i class="bi bi-people"></i>Usuarios
                             </a>
