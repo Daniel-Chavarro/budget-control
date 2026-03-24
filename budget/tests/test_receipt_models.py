@@ -1,7 +1,7 @@
 """Test suite for receipt models."""
 from django.test import TestCase
 from django.contrib.auth.models import User
-from budget.models import Receipt, ExpenseData
+from budget.models import Receipt
 from decimal import Decimal
 from datetime import date
 
