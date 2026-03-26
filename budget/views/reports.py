@@ -1,4 +1,5 @@
 """Report views for budget app."""
+from datetime import datetime
 from django.shortcuts import render
 from django.db.models import Sum, Count
 from budget.decorators import admin_required
@@ -8,10 +9,25 @@ from budget.models import Receipt, Category
 @admin_required
 def expense_report_view(request):
     """Detailed expense/income report with filtering."""
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
+    start_date_str = request.GET.get('start_date', '')
+    end_date_str = request.GET.get('end_date', '')
     category_id = request.GET.get('category', '')
     report_type = request.GET.get('type', 'all')
+    
+    start_date = None
+    end_date = None
+    
+    if start_date_str:
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+        except (ValueError, TypeError):
+            pass
+    
+    if end_date_str:
+        try:
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+        except (ValueError, TypeError):
+            pass
     
     expense_categories = Category.objects.filter(category_type='expense', is_active=True).order_by('name_es')
     income_categories = Category.objects.filter(category_type='income', is_active=True).order_by('name_es')
@@ -22,6 +38,11 @@ def expense_report_view(request):
         receipts = receipts.filter(date__gte=start_date)
     if end_date:
         receipts = receipts.filter(date__lte=end_date)
+    if category_id:
+        try:
+            receipts = receipts.filter(category_id=int(category_id))
+        except (ValueError, TypeError):
+            pass
     
     expenses = receipts.filter(receipt_type='expense')
     incomes = receipts.filter(receipt_type='income')

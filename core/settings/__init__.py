@@ -7,5 +7,10 @@ ENVIRONMENT = os.environ.get('DJANGO_ENV', 'development')
 
 if ENVIRONMENT == 'production':
     from .production import *
-else:
+elif ENVIRONMENT == 'development':
     from .development import *
+else:
+    raise RuntimeError(
+        f"Invalid DJANGO_ENV value: '{ENVIRONMENT}'. "
+        f"Allowed values are: 'development', 'production'"
+    )

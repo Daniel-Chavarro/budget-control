@@ -1,0 +1,46 @@
+{% extends "budget/base.html" %}
+
+{% block title %}Eliminar Usuario - Control de Presupuesto{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'budget:user_management' %}">Usuarios</a></li>
+            <li class="breadcrumb-item active">Eliminar</li>
+        </ol>
+    </nav>
+    <h1 class="page-title"><i class="bi bi-exclamation-triangle me-2 text-danger"></i>Eliminar Usuario</h1>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <p class="mb-4">Esta seguro de que desea <strong>eliminar</strong> el siguiente usuario?</p>
+        
+        <div class="alert alert-danger">
+            <strong>{{ user.username }}</strong>
+            <small class="text-muted d-block">{{ user.email }}</small>
+            <span class="badge bg-secondary mt-2">
+                {{ user.userprofile.role|default:"sin rol" }}
+            </span>
+        </div>
+        
+        <p class="text-muted small mb-4">
+            <i class="bi bi-info-circle me-1"></i>
+            Esta accion no se puede deshacer. Todos los comprobantes subidos por este usuario remain en el sistema.
+        </p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash me-1"></i>Eliminar
+                </button>
+                <a href="{% url 'budget:user_management' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

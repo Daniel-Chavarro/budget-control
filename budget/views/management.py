@@ -19,23 +19,17 @@ def user_create_view(request):
     """Create a new tenant or unlinked_user."""
     if request.method == 'POST':
         user_form = UserCreateForm(request.POST)
-        role = request.POST.get('role', 'tenant')
         
         if user_form.is_valid():
             user = user_form.save()
-            profile = UserProfile.objects.get_or_create(user=user)[0]
-            profile.role = role
-            profile.save()
             messages.success(request, f'User {user.username} created successfully.')
             return redirect('budget:user_management')
     else:
         user_form = UserCreateForm()
-        role = 'tenant'
     
     return render(request, 'budget/management/user_form.html', {
         'form': user_form,
         'action': 'Create',
-        'role': role
     })
 
 
@@ -48,10 +42,15 @@ def user_delete_view(request, pk):
         messages.error(request, 'Cannot delete superuser accounts.')
         return redirect('budget:user_management')
     
-    username = user.username
-    user.delete()
-    messages.success(request, f'User {username} deleted successfully.')
-    return redirect('budget:user_management')
+    if request.method == 'POST':
+        username = user.username
+        user.delete()
+        messages.success(request, f'User {username} deleted successfully.')
+        return redirect('budget:user_management')
+    
+    return render(request, 'budget/management/user_delete_confirm.html', {
+        'user': user
+    })
 
 
 @admin_required

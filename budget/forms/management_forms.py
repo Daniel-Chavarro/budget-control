@@ -1,6 +1,7 @@
 """Management forms for users and categories."""
 from django import forms
 from django.contrib.auth.models import User
+from django.contrib.auth import password_validation
 from budget.models import UserProfile, Category
 
 
@@ -9,6 +10,16 @@ class UserCreateForm(forms.ModelForm):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
         label='Password'
+    )
+    password_confirmation = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        label='Confirmar Password'
+    )
+    role = forms.ChoiceField(
+        choices=UserProfile.ROLE_CHOICES,
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        label='Rol del Usuario',
+        required=True
     )
     
     class Meta:
@@ -25,11 +36,37 @@ class UserCreateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['email'].required = True
     
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get('password')
+        password_confirmation = cleaned_data.get('password_confirmation')
+        
+        if password and password_confirmation:
+            if password != password_confirmation:
+                raise forms.ValidationError({'password_confirmation': 'Las contraseñas no coinciden.'})
+            
+            try:
+                password_validation.validate_password(password, self.instance)
+            except forms.ValidationError as e:
+                raise forms.ValidationError({'password': e.messages})
+        
+        return cleaned_data
+    
+    def clean_role(self):
+        role = self.cleaned_data.get('role')
+        if role not in ['tenant', 'unlinked_user']:
+            raise forms.ValidationError('Rol inválido.')
+        return role
+    
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data['password'])
         if commit:
             user.save()
+            UserProfile.objects.update_or_create(
+                user=user,
+                defaults={'role': self.cleaned_data.get('role', 'tenant')}
+            )
         return user
 
 

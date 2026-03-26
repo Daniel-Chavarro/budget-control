@@ -500,9 +500,12 @@ body {
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <a class="dropdown-item text-danger" href="{% url 'budget:logout' %}">
-                                        <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
-                                    </a>
+                                    <form method="post" action="{% url 'budget:logout' %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item text-danger btn btn-link p-0">
+                                            <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
+                                        </button>
+                                    </form>
                                 </li>
                             </ul>
                         </li>
