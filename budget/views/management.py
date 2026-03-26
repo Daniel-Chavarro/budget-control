@@ -36,7 +36,7 @@ def user_create_view(request):
 @admin_required
 def user_delete_view(request, pk):
     """Delete a user."""
-    user = get_object_or_404(User, pk=pk)
+    user = get_object_or_404(User.objects.select_related('userprofile'), pk=pk)
     
     if user.is_superuser:
         messages.error(request, 'Cannot delete superuser accounts.')
