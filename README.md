@@ -176,7 +176,12 @@ open htmlcov/index.html
 2. Set environment variables:
    ```bash
    export DEBUG=False
-   export DATABASE_URL=postgres://user:pass@host/dbname
+   export SECRET_KEY=your-secret-key
+   export DB_NAME=dbname
+   export DB_USER=user
+   export DB_PASSWORD=pass
+   export DB_HOST=host
+   export DB_PORT=5432
    ```
 
 3. Collect static files:
@@ -195,7 +200,11 @@ open htmlcov/index.html
 |----------|-------------|---------|
 | `SECRET_KEY` | Django secret key | (insecure default) |
 | `DEBUG` | Debug mode | `False` |
-| `DATABASE_URL` | PostgreSQL connection string | SQLite |
+| `DB_NAME` | PostgreSQL database name | - |
+| `DB_USER` | PostgreSQL username | - |
+| `DB_PASSWORD` | PostgreSQL password | - |
+| `DB_HOST` | PostgreSQL host | `localhost` |
+| `DB_PORT` | PostgreSQL port | `5432` |
 | `STORAGE_PROVIDER` | `google_drive` or `cloudinary` | `google_drive` |
 | `GOOGLE_DRIVE_CREDENTIALS_FILE` | Path to credentials JSON | - |
 | `CLOUDINARY_URL` | Cloudinary connection URL | - |
