@@ -1,7 +1,7 @@
 """Test suite for receipt models."""
 from django.test import TestCase
 from django.contrib.auth.models import User
-from budget.models import Receipt
+from budget.models import Receipt, Category
 from decimal import Decimal
 from datetime import date
 
@@ -11,6 +11,11 @@ class TestReceiptModel(TestCase):
     
     def setUp(self):
         self.user = User.objects.create_user(username='tenant', password='pass')
+        self.category = Category.objects.create(
+            name='utilities',
+            name_es='Servicios',
+            category_type='expense'
+        )
     
     def test_create_receipt(self):
         """Test creating receipt."""
@@ -24,29 +29,20 @@ class TestReceiptModel(TestCase):
         assert receipt.status == 'pending_review'
         assert receipt.is_pending
         assert str(receipt) == f'Receipt receipt_001.jpg by tenant'
-
-
-class TestExpenseDataModel(TestCase):
-    """Test ExpenseData model."""
     
-    def setUp(self):
-        self.user = User.objects.create_user(username='tenant', password='pass')
-        self.receipt = Receipt.objects.create(
+    def test_create_receipt_with_expense_data(self):
+        """Test creating receipt with expense data."""
+        receipt = Receipt.objects.create(
             uploaded_by=self.user,
             original_file_url='https://example.com/file.jpg',
-            file_name='receipt.jpg'
-        )
-    
-    def test_create_expense_data(self):
-        """Test creating expense data."""
-        expense = ExpenseData.objects.create(
-            receipt=self.receipt,
+            file_name='receipt.jpg',
             date=date.today(),
             amount=Decimal('99.99'),
-            vendor='Test Vendor',
-            category='utilities',
-            description='Electric bill'
+            counterparty='Test Vendor',
+            category=self.category,
+            description='Electric bill',
+            modified_by_user=True
         )
-        assert expense.amount == Decimal('99.99')
-        assert expense.vendor == 'Test Vendor'
-        assert not expense.modified_by_user
+        assert receipt.amount == Decimal('99.99')
+        assert receipt.counterparty == 'Test Vendor'
+        assert receipt.modified_by_user

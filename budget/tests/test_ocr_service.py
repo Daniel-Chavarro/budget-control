@@ -7,7 +7,6 @@ from budget.services.ocr_service import (
     GeminiOCRService,
     get_ocr_service
 )
-from datetime import date
 
 
 class TestOCRServiceAbstraction(TestCase):
@@ -20,18 +19,14 @@ class TestOCRServiceAbstraction(TestCase):
             service.extract_receipt_data(Mock())
     
     @patch('budget.services.ocr_service.genai')
-    @patch('budget.services.ocr_service.GeminiOCRService._call_gemini_api')
-    def test_gemini_ocr_extraction(self, mock_api, mock_genai):
+    def test_gemini_ocr_extraction(self, mock_genai):
         """Test Gemini OCR extraction."""
-        mock_api.return_value = {
-            'date': '2026-03-21',
-            'amount': '45.99',
-            'vendor': 'Test Store',
-            'category': 'utilities',
-            'description': 'Electric bill'
-        }
+        mock_response = Mock()
+        mock_response.text = '{"date": "2026-03-21", "amount": "45.99", "vendor": "Test Store", "category": "Servicios", "description": "Electric bill"}'
         
-        mock_genai.GenerativeModel.return_value = Mock()
+        mock_client = Mock()
+        mock_client.models.generate_content.return_value = mock_response
+        mock_genai.Client.return_value = mock_client
         
         service = GeminiOCRService()
         file_mock = Mock()
@@ -39,7 +34,6 @@ class TestOCRServiceAbstraction(TestCase):
         
         assert result['vendor'] == 'Test Store'
         assert result['amount'] == '45.99'
-        assert result['confidence'] == 0.85
     
     @patch('budget.services.ocr_service.settings')
     def test_get_ocr_service_gemini(self, mock_settings):

@@ -15,7 +15,7 @@ class TestRegistrationView(TestCase):
         """Test registration page is accessible."""
         response = self.client.get(reverse('budget:register'))
         assert response.status_code == 200
-        assert b'Register' in response.content
+        assert b'Crear Cuenta' in response.content
     
     def test_user_registration_success(self):
         """Test successful user registration."""
@@ -63,7 +63,7 @@ class TestLoginView(TestCase):
         """Test login page is accessible."""
         response = self.client.get(reverse('budget:login'))
         assert response.status_code == 200
-        assert b'Login' in response.content
+        assert b'Bienvenido' in response.content
     
     def test_login_success(self):
         """Test successful login."""
@@ -85,4 +85,4 @@ class TestLoginView(TestCase):
         response = self.client.post(reverse('budget:login'), data)
         
         assert response.status_code == 200
-        assert b'Login' in response.content
+        assert b'Bienvenido' in response.content

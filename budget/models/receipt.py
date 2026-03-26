@@ -89,6 +89,13 @@ class Receipt(models.Model):
         verbose_name = 'Receipt'
         verbose_name_plural = 'Receipts'
         ordering = ['-upload_timestamp']
+        indexes = [
+            models.Index(fields=['status', 'upload_timestamp']),
+            models.Index(fields=['uploaded_by', 'status']),
+            models.Index(fields=['status', 'receipt_type', 'date']),
+            models.Index(fields=['status', 'receipt_type', 'uploaded_by']),
+            models.Index(fields=['category', 'status']),
+        ]
     
     def __str__(self):
         return f'Receipt {self.file_name} by {self.uploaded_by.username}'
