@@ -46,7 +46,7 @@ cp .env.example .env
 
 Edit `.env` with your settings:
 
-```
+```bash
 SECRET_KEY=your-secret-key-here
 DEBUG=True
 
@@ -112,7 +112,7 @@ Visit `http://localhost:8000` and log in with your admin credentials.
 
 ## Project Structure
 
-```
+```text
 budget-control/
 ├── core/                     # Project settings
 │   ├── settings/
@@ -163,7 +163,17 @@ pytest --cov=budget --cov-report=html
 View coverage report:
 
 ```bash
+# Windows
+start htmlcov\index.html
+
+# macOS
 open htmlcov/index.html
+
+# Linux
+xdg-open htmlcov/index.html
+
+# Or serve locally
+cd htmlcov && python -m http.server
 ```
 
 ## Production Deployment
