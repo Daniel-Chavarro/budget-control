@@ -9,11 +9,11 @@ class UserCreateForm(forms.ModelForm):
     """Form for admin to create users (tenant/unlinked_user)."""
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        label='Password'
+        label='Contraseña'
     )
     password_confirmation = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        label='Confirmar Password'
+        label='Confirmar contraseña'
     )
     role = forms.ChoiceField(
         choices=UserProfile.ROLE_CHOICES,
@@ -25,6 +25,12 @@ class UserCreateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'first_name', 'last_name']
+        labels = {
+            'username': 'Usuario',
+            'email': 'Correo electrónico',
+            'first_name': 'Nombre',
+            'last_name': 'Apellido',
+        }
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
@@ -75,16 +81,14 @@ class CategoryForm(forms.ModelForm):
     
     class Meta:
         model = Category
-        fields = ['name', 'name_es', 'category_type', 'is_active']
+        fields = ['name', 'category_type', 'is_active']
         labels = {
-            'name': 'Nombre (ingles)',
-            'name_es': 'Nombre (espanol)',
+            'name': 'Nombre',
             'category_type': 'Tipo',
             'is_active': 'Activo',
         }
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'name_es': forms.TextInput(attrs={'class': 'form-control'}),
             'category_type': forms.Select(attrs={'class': 'form-select'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }

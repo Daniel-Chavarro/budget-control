@@ -7,12 +7,11 @@ class Category(models.Model):
     """Expense/Income category."""
     
     TYPE_CHOICES = [
-        ('expense', 'Gasto'),
-        ('income', 'Ingreso'),
+        ('gasto', 'Gasto'),
+        ('ingreso', 'Ingreso'),
     ]
     
     name = models.CharField(max_length=50, unique=True)
-    name_es = models.CharField('Nombre en espanol', max_length=50)
     category_type = models.CharField(max_length=10, choices=TYPE_CHOICES)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -24,21 +23,21 @@ class Category(models.Model):
         ordering = ['category_type', 'name']
     
     def __str__(self):
-        return f'{self.name_es}'
+        return f'{self.name}'
 
 
 class Receipt(models.Model):
     """Uploaded receipt record."""
     
     STATUS_CHOICES = [
-        ('pending_review', 'Pending Review'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected'),
+        ('pendiente', 'Pendiente'),
+        ('aprobado', 'Aprobado'),
+        ('rechazado', 'Rechazado'),
     ]
     
     RECEIPT_TYPE_CHOICES = [
-        ('income', 'Ingreso'),
-        ('expense', 'Gasto'),
+        ('ingreso', 'Ingreso'),
+        ('gasto', 'Gasto'),
     ]
     
     uploaded_by = models.ForeignKey(
@@ -52,13 +51,13 @@ class Receipt(models.Model):
     receipt_type = models.CharField(
         max_length=10,
         choices=RECEIPT_TYPE_CHOICES,
-        default='expense'
+        default='gasto'
     )
     
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
-        default='pending_review'
+        default='pendiente'
     )
     
     reviewed_by = models.ForeignKey(
@@ -102,15 +101,12 @@ class Receipt(models.Model):
     
     @property
     def is_pending(self):
-        """Check if receipt is pending review."""
-        return self.status == 'pending_review'
+        return self.status == 'pendiente'
     
     @property
     def is_approved(self):
-        """Check if receipt is approved."""
-        return self.status == 'approved'
+        return self.status == 'aprobado'
     
     @property
     def is_rejected(self):
-        """Check if receipt is rejected."""
-        return self.status == 'rejected'
+        return self.status == 'rechazado'
