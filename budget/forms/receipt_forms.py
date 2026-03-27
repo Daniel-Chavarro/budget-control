@@ -20,7 +20,7 @@ class ReceiptUploadForm(forms.Form):
         label='Tipo de comprobante',
         choices=Receipt.RECEIPT_TYPE_CHOICES,
         widget=forms.Select(attrs={'class': 'form-select'}),
-        initial='expense',
+        initial='gasto',
         required=False
     )
     
@@ -33,7 +33,7 @@ class ReceiptUploadForm(forms.Form):
     
     def clean_receipt_type(self):
         """Return default if not provided."""
-        return self.cleaned_data.get('receipt_type') or 'income'
+        return self.cleaned_data.get('receipt_type') or 'ingreso'
     
     def clean_receipt_file(self):
         """Validate file size and type."""
@@ -50,7 +50,7 @@ class ReceiptUploadForm(forms.Form):
         return file
 
 
-def get_category_by_name_es(name: str, category_type: str = 'expense'):
+def get_category_by_name(name: str, category_type: str = 'gasto'):
     """Helper to get Category by Spanish name for OCR mapping."""
     if not name:
         return None
@@ -63,7 +63,7 @@ def get_category_by_name_es(name: str, category_type: str = 'expense'):
 class TransactionForm(forms.ModelForm):
     """Unified form for transaction data (income or expense)."""
     
-    def __init__(self, *args, receipt_type='expense', **kwargs):
+    def __init__(self, *args, receipt_type='gasto', **kwargs):
         super().__init__(*args, **kwargs)
         self.receipt_type = receipt_type
         self.fields['category'].queryset = Category.objects.filter(
@@ -72,7 +72,7 @@ class TransactionForm(forms.ModelForm):
         ).order_by('name_es')
         self.fields['category'].empty_label = 'Seleccionar categoria'
         
-        if receipt_type == 'expense':
+        if receipt_type == 'gasto':
             self.fields['counterparty'].label = 'Proveedor'
         else:
             self.fields['counterparty'].label = 'Pagador'
