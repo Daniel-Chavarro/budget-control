@@ -29,10 +29,10 @@ def expense_report_view(request):
         except (ValueError, TypeError):
             pass
     
-    expense_categories = Category.objects.filter(category_type='expense', is_active=True).order_by('name_es')
-    income_categories = Category.objects.filter(category_type='income', is_active=True).order_by('name_es')
+    expense_categories = Category.objects.filter(category_type='gasto', is_active=True).order_by('name_es')
+    income_categories = Category.objects.filter(category_type='ingreso', is_active=True).order_by('name_es')
     
-    receipts = Receipt.objects.filter(status='approved')
+    receipts = Receipt.objects.filter(status='aprobado')
     
     if start_date:
         receipts = receipts.filter(date__gte=start_date)
@@ -44,8 +44,8 @@ def expense_report_view(request):
         except (ValueError, TypeError):
             pass
     
-    expenses = receipts.filter(receipt_type='expense')
-    incomes = receipts.filter(receipt_type='income')
+    expenses = receipts.filter(receipt_type='gasto')
+    incomes = receipts.filter(receipt_type='ingreso')
     
     expense_category_totals = expenses.values('category__name', 'category__name_es').annotate(
         total=Sum('amount'),

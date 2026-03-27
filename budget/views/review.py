@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 @admin_required
 def pending_receipts_view(request):
     """List all pending receipts for review."""
-    pending_receipts = Receipt.objects.filter(status='pending_review')
+    pending_receipts = Receipt.objects.filter(status='pendiente')
     logger.debug(f"[REVIEW] Admin {request.user} viewing pending receipts, count: {pending_receipts.count()}")
     return render(request, 'budget/review/pending_list.html', {
         'pending_receipts': pending_receipts
@@ -42,7 +42,7 @@ def receipt_detail_view(request, pk):
                 receipt.description = transaction.description
                 receipt.modified_by_user = True
                 
-                receipt.status = 'approved'
+                receipt.status = 'aprobado'
                 receipt.reviewed_by = request.user
                 receipt.review_timestamp = timezone.now()
                 receipt.review_notes = request.POST.get('review_notes', '')
@@ -60,7 +60,7 @@ def receipt_detail_view(request, pk):
                 logger.warning(f"[REVIEW] Rejection rejected - no notes provided")
                 messages.error(request, 'Notas de rechazo son requeridas.')
             else:
-                receipt.status = 'rejected'
+                receipt.status = 'rechazado'
                 receipt.reviewed_by = request.user
                 receipt.review_timestamp = timezone.now()
                 receipt.review_notes = notes

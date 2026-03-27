@@ -25,15 +25,15 @@ def tenant_dashboard(request):
     this_year_start = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
     
     month_total = Receipt.objects.filter(
-        status='approved',
-        receipt_type='income',
+        status='aprobado',
+        receipt_type='ingreso',
         uploaded_by=user,
         date__gte=this_month_start
     ).aggregate(total=Sum('amount'))['total'] or 0
     
     year_total = Receipt.objects.filter(
-        status='approved',
-        receipt_type='income',
+        status='aprobado',
+        receipt_type='ingreso',
         uploaded_by=user,
         date__gte=this_year_start
     ).aggregate(total=Sum('amount'))['total'] or 0
@@ -43,8 +43,8 @@ def tenant_dashboard(request):
     ).order_by('-upload_timestamp')[:10]
     
     recent_incomes = Receipt.objects.filter(
-        status='approved',
-        receipt_type='income',
+        status='aprobado',
+        receipt_type='ingreso',
         uploaded_by=user
     ).order_by('-date')[:10]
     
@@ -60,37 +60,37 @@ def tenant_dashboard(request):
 
 def admin_dashboard(request):
     """Dashboard for admin users."""
-    pending_count = Receipt.objects.filter(status='pending_review').count()
-    approved_count = Receipt.objects.filter(status='approved').count()
-    rejected_count = Receipt.objects.filter(status='rejected').count()
+    pending_count = Receipt.objects.filter(status='pendiente').count()
+    approved_count = Receipt.objects.filter(status='aprobado').count()
+    rejected_count = Receipt.objects.filter(status='rechazado').count()
     total_users = User.objects.count()
     
     now = datetime.now()
     this_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     
     month_expenses = Receipt.objects.filter(
-        status='approved',
-        receipt_type='expense',
+        status='aprobado',
+        receipt_type='gasto',
         date__gte=this_month_start
     ).aggregate(total=Sum('amount'))['total'] or 0
     
     month_incomes = Receipt.objects.filter(
-        status='approved',
-        receipt_type='income',
+        status='aprobado',
+        receipt_type='ingreso',
         date__gte=this_month_start
     ).aggregate(total=Sum('amount'))['total'] or 0
     
     expense_category_breakdown = Receipt.objects.filter(
-        status='approved',
-        receipt_type='expense'
+        status='aprobado',
+        receipt_type='gasto'
     ).values('category__name', 'category__name_es').annotate(
         total=Sum('amount'),
         count=Count('id')
     ).order_by('-total')
     
     income_category_breakdown = Receipt.objects.filter(
-        status='approved',
-        receipt_type='income'
+        status='aprobado',
+        receipt_type='ingreso'
     ).values('category__name', 'category__name_es').annotate(
         total=Sum('amount'),
         count=Count('id')
@@ -99,7 +99,7 @@ def admin_dashboard(request):
     recent_receipts = Receipt.objects.all().order_by('-upload_timestamp')[:10]
     
     pending_receipts = Receipt.objects.filter(
-        status='pending_review'
+        status='pendiente'
     ).select_related('uploaded_by')[:5]
     
     context = {
