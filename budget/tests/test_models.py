@@ -23,8 +23,8 @@ class TestUserProfile(TestCase):
         profile = user.userprofile
         
         assert profile.user == user
-        assert profile.role == 'tenant'  # Default role
-        assert str(profile) == 'testuser (tenant)'
+        assert profile.role == 'inquilino'  # Default role
+        assert str(profile) == 'testuser (inquilino)'
     
     def test_user_profile_update(self):
         """Test updating a user profile."""
@@ -47,7 +47,7 @@ class TestUserProfile(TestCase):
     
     def test_user_profile_role_choices(self):
         """Test role field accepts valid choices."""
-        for role in ['admin', 'tenant', 'unlinked_user']:
+        for role in ['admin', 'inquilino', 'sin_vinculo']:
             user = User.objects.create_user(
                 username=f'test_{role}',
                 password='pass'
@@ -65,7 +65,7 @@ class TestUserProfile(TestCase):
         profile = user.userprofile
         
         # Test is_tenant
-        profile.role = 'tenant'
+        profile.role = 'inquilino'
         assert profile.is_tenant
         assert not profile.is_admin
         assert not profile.is_unlinked_user
@@ -76,7 +76,7 @@ class TestUserProfile(TestCase):
         assert not profile.is_tenant
         
         # Test is_unlinked_user
-        profile.role = 'unlinked_user'
+        profile.role = 'sin_vinculo'
         assert profile.is_unlinked_user
         assert not profile.is_tenant
 

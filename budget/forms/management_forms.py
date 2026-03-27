@@ -60,7 +60,7 @@ class UserCreateForm(forms.ModelForm):
     
     def clean_role(self):
         role = self.cleaned_data.get('role')
-        if role not in ['tenant', 'unlinked_user']:
+        if role not in ['inquilino', 'sin_vinculo']:
             raise forms.ValidationError('Rol inválido.')
         return role
     
@@ -71,7 +71,7 @@ class UserCreateForm(forms.ModelForm):
             user.save()
             UserProfile.objects.update_or_create(
                 user=user,
-                defaults={'role': self.cleaned_data.get('role', 'tenant')}
+                defaults={'role': self.cleaned_data.get('role', 'inquilino')}
             )
         return user
 

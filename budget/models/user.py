@@ -9,9 +9,9 @@ class UserProfile(models.Model):
     """Extended user profile with role and contact info."""
     
     ROLE_CHOICES = [
-        ('admin', 'Admin'),
-        ('tenant', 'Tenant'),
-        ('unlinked_user', 'Unlinked User'),
+        ('admin', 'Administrador'),
+        ('inquilino', 'Inquilino'),
+        ('sin_vinculo', 'Sin Vínculo'),
     ]
     
     user = models.OneToOneField(
@@ -22,7 +22,7 @@ class UserProfile(models.Model):
     role = models.CharField(
         max_length=20,
         choices=ROLE_CHOICES,
-        default='tenant'
+        default='inquilino'
     )
     phone = models.CharField(max_length=20, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -44,12 +44,12 @@ class UserProfile(models.Model):
     @property
     def is_tenant(self):
         """Check if user has tenant role."""
-        return self.role == 'tenant'
+        return self.role == 'inquilino'
     
     @property
     def is_unlinked_user(self):
         """Check if user is unlinked user."""
-        return self.role == 'unlinked_user'
+        return self.role == 'sin_vinculo'
 
 
 @receiver(post_save, sender=User)

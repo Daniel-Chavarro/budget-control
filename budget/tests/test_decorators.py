@@ -23,13 +23,13 @@ class TestPermissionDecorators(TestCase):
         self.tenant_user = User.objects.create_user(
             username='tenant', password='pass'
         )
-        self.tenant_user.userprofile.role = 'tenant'
+        self.tenant_user.userprofile.role = 'inquilino'
         self.tenant_user.userprofile.save()
         
         self.unlinked_user = User.objects.create_user(
             username='unlinked', password='pass'
         )
-        self.unlinked_user.userprofile.role = 'unlinked_user'
+        self.unlinked_user.userprofile.role = 'sin_vinculo'
         self.unlinked_user.userprofile.save()
     
     def test_admin_required_allows_admin(self):
