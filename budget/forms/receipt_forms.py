@@ -20,7 +20,7 @@ class ReceiptUploadForm(forms.Form):
         label='Tipo de comprobante',
         choices=Receipt.RECEIPT_TYPE_CHOICES,
         widget=forms.Select(attrs={'class': 'form-select'}),
-        initial='gasto',
+        initial='ingreso',
         required=False
     )
     

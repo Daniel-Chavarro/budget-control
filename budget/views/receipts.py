@@ -166,15 +166,18 @@ def receipt_upload_view(request):
             mime_prefix = pending_data.get('mime_prefix', 'data:image/jpeg;base64,')
             receipt_url = f"{mime_prefix}{pending_data['file_content']}"
     
+    pending_data = request.session.get('pending_receipt')
+    
     if not is_admin:
         upload_form.fields.pop('upload_as_user', None)
         upload_form.fields['receipt_type'].widget = forms.HiddenInput()
         upload_form.initial['receipt_type'] = 'ingreso'
+    elif pending_data:
+        upload_form.initial['receipt_type'] = pending_data.get('receipt_type', 'ingreso')
     
     receipt_type_display = 'ingreso'
-    if is_admin:
-        pending_data = request.session.get('pending_receipt')
-        receipt_type_display = pending_data.get('receipt_type', 'gasto') if pending_data else 'gasto'
+    if is_admin and pending_data:
+        receipt_type_display = pending_data.get('receipt_type', 'ingreso')
     
     context = {
         'upload_form': upload_form,
