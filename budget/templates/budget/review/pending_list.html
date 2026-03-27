@@ -32,7 +32,7 @@
                             {{ receipt.file_name|truncatechars:25 }}
                         </td>
                         <td>
-                            {% if receipt.receipt_type == 'income' %}
+                            {% if receipt.receipt_type == 'ingreso' %}
                                 <span class="badge bg-success">Ingreso</span>
                             {% else %}
                                 <span class="badge bg-danger">Gasto</span>

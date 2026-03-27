@@ -33,9 +33,9 @@
                 <div class="mb-0">
                     <label class="text-muted small mb-1">Estado</label>
                     <div>
-                        {% if receipt.status == 'pending_review' %}
+                        {% if receipt.status == 'pendiente' %}
                             <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>Pendiente</span>
-                        {% elif receipt.status == 'approved' %}
+                        {% elif receipt.status == 'aprobado' %}
                             <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Aprobado</span>
                         {% else %}
                             <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Rechazado</span>
@@ -60,7 +60,7 @@
     <div class="col-lg-7">
         <div class="card">
             <div class="card-header">
-                <i class="bi bi-pencil-square me-2"></i>Datos del {% if receipt.receipt_type == 'income' %}Ingreso{% else %}Gasto{% endif %}
+                <i class="bi bi-pencil-square me-2"></i>Datos del {% if receipt.receipt_type == 'ingreso' %}Ingreso{% else %}Gasto{% endif %}
             </div>
             <div class="card-body">
                 <form method="post">

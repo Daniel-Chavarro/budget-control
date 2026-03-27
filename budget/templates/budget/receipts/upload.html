@@ -117,13 +117,19 @@
         <div class="card mb-4">
             <div class="card-header">
                 <i class="bi bi-clipboard-check me-2"></i>Paso 2: Revisar y Enviar
-                {% if receipt_type_display == 'income' %}
+                {% if receipt_type_display == 'ingreso' %}
                     <span class="badge bg-success ms-2">Ingreso</span>
                 {% else %}
                     <span class="badge bg-danger ms-2">Gasto</span>
                 {% endif %}
             </div>
             <div class="card-body">
+                {% if upload_error %}
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Upload failed:</strong> The file could not be saved to cloud storage. Please check configuration and try again.
+                </div>
+                {% endif %}
                 <form method="post" id="receipt-form">
                     {% csrf_token %}
                     <div class="row">

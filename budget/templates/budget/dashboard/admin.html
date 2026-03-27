@@ -135,7 +135,7 @@
                                     {{ receipt.file_name|truncatechars:20 }}
                                 </td>
                                 <td>
-                                    {% if receipt.receipt_type == 'income' %}
+                                    {% if receipt.receipt_type == 'ingreso' %}
                                         <span class="badge bg-success">Ingreso</span>
                                     {% else %}
                                         <span class="badge bg-danger">Gasto</span>
@@ -146,7 +146,7 @@
                                     {{ receipt.uploaded_by.username }}
                                 </td>
                                 <td>
-                                    <strong class="{% if receipt.receipt_type == 'income' %}text-success{% else %}text-danger{% endif %}">
+                                    <strong class="{% if receipt.receipt_type == 'ingreso' %}text-success{% else %}text-danger{% endif %}">
                                         ${{ receipt.amount|default:'0.00' }}
                                     </strong>
                                 </td>
@@ -243,7 +243,7 @@
                             {{ receipt.file_name|truncatechars:25 }}
                         </td>
                         <td>
-                            {% if receipt.receipt_type == 'income' %}
+                            {% if receipt.receipt_type == 'ingreso' %}
                                 <span class="badge bg-success">Ingreso</span>
                             {% else %}
                                 <span class="badge bg-danger">Gasto</span>
@@ -254,9 +254,9 @@
                             {{ receipt.uploaded_by.username }}
                         </td>
                         <td>
-                            {% if receipt.status == 'approved' %}
+                            {% if receipt.status == 'aprobado' %}
                                 <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Aprobado</span>
-                            {% elif receipt.status == 'rejected' %}
+                            {% elif receipt.status == 'rechazado' %}
                                 <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Rechazado</span>
                             {% else %}
                                 <span class="badge bg-warning"><i class="bi bi-clock me-1"></i>Pendiente</span>

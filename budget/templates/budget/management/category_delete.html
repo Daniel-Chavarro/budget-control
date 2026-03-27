@@ -20,7 +20,7 @@
         <div class="alert alert-warning">
             <strong>{{ category.name_es }}</strong>
             <small class="text-muted d-block">{{ category.name }}</small>
-            <span class="badge bg-{% if category.category_type == 'expense' %}danger{% else %}success{% endif %} mt-2">
+            <span class="badge bg-{% if category.category_type == 'gasto' %}danger{% else %}success{% endif %} mt-2">
                 {{ category.get_category_type_display }}
             </span>
         </div>

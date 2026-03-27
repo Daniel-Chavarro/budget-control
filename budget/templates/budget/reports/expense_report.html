@@ -23,22 +23,22 @@
                 <label class="form-label fw-medium">Tipo</label>
                 <select name="type" class="form-select">
                     <option value="all" {% if selected_type == 'all' %}selected{% endif %}>Todos</option>
-                    <option value="expense" {% if selected_type == 'expense' %}selected{% endif %}>Gastos</option>
-                    <option value="income" {% if selected_type == 'income' %}selected{% endif %}>Ingresos</option>
+                    <option value="gasto" {% if selected_type == 'gasto' %}selected{% endif %}>Gastos</option>
+                    <option value="ingreso" {% if selected_type == 'ingreso' %}selected{% endif %}>Ingresos</option>
                 </select>
             </div>
             <div class="col-md-3">
                 <label class="form-label fw-medium">Categoria</label>
                 <select name="category" class="form-select">
                     <option value="">Todas las Categorias</option>
-                    {% if selected_type != 'income' %}
+                    {% if selected_type != 'ingreso' %}
                         {% for cat in expense_categories %}
                         <option value="{{ cat.id|stringformat:"s" }}" {% if cat.id|stringformat:"s" == selected_category %}selected{% endif %}>
                             [Gasto] {{ cat.name_es }}
                         </option>
                         {% endfor %}
                     {% endif %}
-                    {% if selected_type != 'expense' %}
+                    {% if selected_type != 'gasto' %}
                         {% for cat in income_categories %}
                         <option value="{{ cat.id|stringformat:"s" }}" {% if cat.id|stringformat:"s" == selected_category %}selected{% endif %}>
                             [Ingreso] {{ cat.name_es }}

@@ -14,13 +14,13 @@
             <a href="?status=all" class="btn btn-sm {% if not selected_status or selected_status == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">
                 <i class="bi bi-list me-1"></i>Todos
             </a>
-            <a href="?status=pending_review" class="btn btn-sm {% if selected_status == 'pending_review' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+            <a href="?status=pendiente" class="btn btn-sm {% if selected_status == 'pendiente' %}btn-warning{% else %}btn-outline-warning{% endif %}">
                 <i class="bi bi-clock me-1"></i>Pendientes
             </a>
-            <a href="?status=approved" class="btn btn-sm {% if selected_status == 'approved' %}btn-success{% else %}btn-outline-success{% endif %}">
+            <a href="?status=aprobado" class="btn btn-sm {% if selected_status == 'aprobado' %}btn-success{% else %}btn-outline-success{% endif %}">
                 <i class="bi bi-check-circle me-1"></i>Aprobados
             </a>
-            <a href="?status=rejected" class="btn btn-sm {% if selected_status == 'rejected' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+            <a href="?status=rechazado" class="btn btn-sm {% if selected_status == 'rechazado' %}btn-danger{% else %}btn-outline-danger{% endif %}">
                 <i class="bi bi-x-circle me-1"></i>Rechazados
             </a>
         </div>
@@ -54,9 +54,9 @@
                             {{ receipt.uploaded_by.username }}
                         </td>
                         <td>
-                            {% if receipt.status == 'approved' %}
+                            {% if receipt.status == 'aprobado' %}
                                 <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Aprobado</span>
-                            {% elif receipt.status == 'rejected' %}
+                            {% elif receipt.status == 'rechazado' %}
                                 <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Rechazado</span>
                             {% else %}
                                 <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>Pendiente</span>
