@@ -55,7 +55,7 @@ def get_category_by_name(name: str, category_type: str = 'gasto'):
     if not name:
         return None
     try:
-        return Category.objects.get(name_es__iexact=name, category_type=category_type, is_active=True)
+        return Category.objects.get(name__iexact=name, category_type=category_type, is_active=True)
     except Category.DoesNotExist:
         return None
 
@@ -69,7 +69,7 @@ class TransactionForm(forms.ModelForm):
         self.fields['category'].queryset = Category.objects.filter(
             category_type=receipt_type,
             is_active=True
-        ).order_by('name_es')
+        ).order_by('name')
         self.fields['category'].empty_label = 'Seleccionar categoria'
         
         if receipt_type == 'gasto':

@@ -83,7 +83,7 @@ def admin_dashboard(request):
     expense_category_breakdown = Receipt.objects.filter(
         status='aprobado',
         receipt_type='gasto'
-    ).values('category__name', 'category__name_es').annotate(
+    ).values('category__name').annotate(
         total=Sum('amount'),
         count=Count('id')
     ).order_by('-total')
@@ -91,7 +91,7 @@ def admin_dashboard(request):
     income_category_breakdown = Receipt.objects.filter(
         status='aprobado',
         receipt_type='ingreso'
-    ).values('category__name', 'category__name_es').annotate(
+    ).values('category__name').annotate(
         total=Sum('amount'),
         count=Count('id')
     ).order_by('-total')

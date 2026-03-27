@@ -67,7 +67,7 @@ def category_create_view(request):
         form = CategoryForm(request.POST)
         if form.is_valid():
             category = form.save()
-            messages.success(request, f'Categoria {category.name_es} creada exitosamente.')
+            messages.success(request, f'Categoria {category.name} creada exitosamente.')
             return redirect('budget:category_list')
     else:
         form = CategoryForm()
@@ -87,7 +87,7 @@ def category_edit_view(request, pk):
         form = CategoryForm(request.POST, instance=category)
         if form.is_valid():
             category = form.save()
-            messages.success(request, f'Categoria {category.name_es} actualizada exitosamente.')
+            messages.success(request, f'Categoria {category.name} actualizada exitosamente.')
             return redirect('budget:category_list')
     else:
         form = CategoryForm(instance=category)
@@ -107,7 +107,7 @@ def category_delete_view(request, pk):
     if request.method == 'POST':
         category.is_active = False
         category.save()
-        messages.success(request, f'Categoria {category.name_es} desactivada.')
+        messages.success(request, f'Categoria {category.name} desactivada.')
         return redirect('budget:category_list')
     
     return render(request, 'budget/management/category_delete.html', {
