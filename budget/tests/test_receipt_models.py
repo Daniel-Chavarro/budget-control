@@ -12,9 +12,8 @@ class TestReceiptModel(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='tenant', password='pass')
         self.category = Category.objects.create(
-            name='utilities',
-            name_es='Servicios',
-            category_type='expense'
+            name='Servicios',
+            category_type='gasto'
         )
     
     def test_create_receipt(self):
@@ -23,10 +22,10 @@ class TestReceiptModel(TestCase):
             uploaded_by=self.user,
             original_file_url='https://example.com/file.jpg',
             file_name='receipt_001.jpg',
-            status='pending_review'
+            status='pendiente'
         )
         assert receipt.uploaded_by == self.user
-        assert receipt.status == 'pending_review'
+        assert receipt.status == 'pendiente'
         assert receipt.is_pending
         assert str(receipt) == f'Receipt receipt_001.jpg by tenant'
     

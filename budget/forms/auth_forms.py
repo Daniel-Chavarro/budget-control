@@ -1,8 +1,17 @@
 """Authentication forms for budget app."""
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from budget.models import UserProfile
+
+
+class SpanishAuthenticationForm(AuthenticationForm):
+    """Custom AuthenticationForm with Spanish labels."""
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].label = 'Usuario'
+        self.fields['password'].label = 'Contraseña'
 
 
 class UserRegistrationForm(UserCreationForm):
@@ -21,6 +30,12 @@ class UserRegistrationForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']
+        labels = {
+            'username': 'Usuario',
+            'email': 'Correo electrónico',
+            'password1': 'Contraseña',
+            'password2': 'Confirmar contraseña',
+        }
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control'}),
         }

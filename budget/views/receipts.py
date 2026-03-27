@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from budget.decorators import any_authenticated_user, rate_limit
 from budget.models import Receipt
-from budget.forms import ReceiptUploadForm, TransactionForm, get_category_by_name_es
+from budget.forms import ReceiptUploadForm, TransactionForm, get_category_by_name
 from budget.services import get_storage_service, get_ocr_service
 from datetime import datetime, timedelta
 

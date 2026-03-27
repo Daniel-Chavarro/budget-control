@@ -60,8 +60,8 @@ class GeminiOCRService(BaseOCRService):
             else:
                 image_data = image_file
 
-            categories = Category.objects.filter(category_type='expense', is_active=True).order_by('name_es')
-            categories_names = [str(n.name_es) for n in categories]
+            categories = Category.objects.filter(category_type='gasto', is_active=True).order_by('name')
+            categories_names = [str(n.name) for n in categories]
 
             prompt = """
             Extraiga la siguiente informacion de esta imagen del recibo:

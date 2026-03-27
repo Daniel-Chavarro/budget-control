@@ -29,7 +29,7 @@ def account_settings_view(request):
                     request.user.userprofile.phone = account_form.cleaned_data.get('phone', '')
                     request.user.userprofile.save()
                 
-                messages.success(request, 'Account details updated successfully.')
+                messages.success(request, 'Detalles de cuenta actualizados exitosamente.')
                 return redirect('budget:account_settings')
         elif 'current_password' in request.POST:
             password_form = PasswordChangeForm(request.POST, user=request.user)
@@ -37,7 +37,7 @@ def account_settings_view(request):
                 request.user.set_password(password_form.cleaned_data['new_password'])
                 request.user.save()
                 update_session_auth_hash(request, request.user)
-                messages.success(request, 'Password changed successfully.')
+                messages.success(request, 'Contraseña actualizada exitosamente.')
                 return redirect('budget:account_settings')
     
     return render(request, 'budget/account/account_settings.html', {

@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.urls import reverse
 from django.views.decorators.http import require_POST
-from budget.forms import UserRegistrationForm
+from budget.forms import UserRegistrationForm, SpanishAuthenticationForm
 
 
 def register_view(request):
@@ -15,7 +15,7 @@ def register_view(request):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            messages.success(request, 'Registration successful! Please login.')
+            messages.success(request, '¡Registro exitoso! Por favor inicie sesión.')
             return redirect('budget:login')
     else:
         form = UserRegistrationForm()
@@ -26,7 +26,7 @@ def register_view(request):
 def login_view(request):
     """User login view."""
     if request.method == 'POST':
-        form = AuthenticationForm(data=request.POST)
+        form = SpanishAuthenticationForm(data=request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
@@ -39,7 +39,7 @@ def login_view(request):
                 return redirect(next_url)
             return redirect(reverse('budget:dashboard'))
     else:
-        form = AuthenticationForm()
+        form = SpanishAuthenticationForm()
     
     return render(request, 'budget/auth/login.html', {'form': form})
 
@@ -48,5 +48,5 @@ def login_view(request):
 def logout_view(request):
     """User logout view."""
     logout(request)
-    messages.success(request, 'Logged out successfully.')
+    messages.success(request, 'Sesión cerrada exitosamente.')
     return redirect('budget:login')

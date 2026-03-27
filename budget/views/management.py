@@ -22,7 +22,7 @@ def user_create_view(request):
         
         if user_form.is_valid():
             user = user_form.save()
-            messages.success(request, f'User {user.username} created successfully.')
+            messages.success(request, f'Usuario {user.username} creado exitosamente.')
             return redirect('budget:user_management')
     else:
         user_form = UserCreateForm()
@@ -39,13 +39,13 @@ def user_delete_view(request, pk):
     user = get_object_or_404(User.objects.select_related('userprofile'), pk=pk)
     
     if user.is_superuser:
-        messages.error(request, 'Cannot delete superuser accounts.')
+        messages.error(request, 'No se pueden eliminar cuentas de superadministrador.')
         return redirect('budget:user_management')
     
     if request.method == 'POST':
         username = user.username
         user.delete()
-        messages.success(request, f'User {username} deleted successfully.')
+        messages.success(request, f'Usuario {username} eliminado exitosamente.')
         return redirect('budget:user_management')
     
     return render(request, 'budget/management/user_delete_confirm.html', {

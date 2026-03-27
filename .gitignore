@@ -212,3 +212,7 @@ __marimo__/
 .claude/
 skills-lock.json
 /secrets/
+
+
+# Test Data
+test_data/

@@ -7,9 +7,20 @@ from django.core.exceptions import ValidationError
 class AccountForm(forms.Form):
     """Form for editing user account details."""
     
-    username = forms.CharField(max_length=150, required=True)
-    email = forms.EmailField(required=True)
-    phone = forms.CharField(max_length=20, required=False)
+    username = forms.CharField(
+        max_length=150, 
+        required=True,
+        label='Usuario'
+    )
+    email = forms.EmailField(
+        required=True,
+        label='Correo electrónico'
+    )
+    phone = forms.CharField(
+        max_length=20, 
+        required=False,
+        label='Teléfono'
+    )
     
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
@@ -22,7 +33,7 @@ class AccountForm(forms.Form):
             if self.user:
                 existing = existing.exclude(pk=self.user.pk)
             if existing.exists():
-                raise ValidationError('A user with that username already exists.')
+                raise ValidationError('Ya existe un usuario con ese nombre.')
         return username
     
     def clean_email(self):
@@ -32,7 +43,7 @@ class AccountForm(forms.Form):
             if self.user:
                 existing = existing.exclude(pk=self.user.pk)
             if existing.exists():
-                raise ValidationError('A user with that email already exists.')
+                raise ValidationError('Ya existe un usuario con ese correo electrónico.')
         return email
 
 
@@ -41,17 +52,20 @@ class PasswordChangeForm(forms.Form):
     
     current_password = forms.CharField(
         widget=forms.PasswordInput(),
-        required=True
+        required=True,
+        label='Contraseña actual'
     )
     new_password = forms.CharField(
         widget=forms.PasswordInput(),
         required=True,
         min_length=8,
-        max_length=128
+        max_length=128,
+        label='Nueva contraseña'
     )
     confirm_password = forms.CharField(
         widget=forms.PasswordInput(),
-        required=True
+        required=True,
+        label='Confirmar contraseña'
     )
     
     def __init__(self, *args, **kwargs):
@@ -62,14 +76,14 @@ class PasswordChangeForm(forms.Form):
         current = self.cleaned_data.get('current_password')
         if current and self.user:
             if not self.user.check_password(current):
-                raise ValidationError('Current password is incorrect.')
+                raise ValidationError('La contraseña actual es incorrecta.')
         return current
     
     def clean_new_password(self):
         new_password = self.cleaned_data.get('new_password')
         if new_password and self.user:
             if self.user.check_password(new_password):
-                raise ValidationError('New password must be different from current password.')
+                raise ValidationError('La nueva contraseña debe ser diferente a la actual.')
         return new_password
     
     def clean(self):
@@ -78,5 +92,5 @@ class PasswordChangeForm(forms.Form):
         confirm_password = cleaned.get('confirm_password')
         if new_password and confirm_password:
             if new_password != confirm_password:
-                raise ValidationError('Passwords do not match.')
+                raise ValidationError('Las contraseñas no coinciden.')
         return cleaned

@@ -1,0 +1,85 @@
+# Spanish translations for Budget app
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: forms/auth_forms.py
+msgid "Username"
+msgstr "Usuario"
+
+msgid "Password"
+msgstr "Contraseña"
+
+msgid "Password confirmation"
+msgstr "Confirmar contraseña"
+
+msgid "Email address"
+msgstr "Correo electrónico"
+
+#: forms/account_forms.py
+msgid "Current password"
+msgstr "Contraseña actual"
+
+msgid "New password"
+msgstr "Nueva contraseña"
+
+msgid "Confirm password"
+msgstr "Confirmar contraseña"
+
+msgid "A user with that username already exists."
+msgstr "Ya existe un usuario con ese nombre."
+
+msgid "Current password is incorrect."
+msgstr "La contraseña actual es incorrecta."
+
+#: forms/management_forms.py
+msgid "Las contraseñas no coinciden."
+msgstr "Las contraseñas no coinciden."
+
+#: django.contrib.auth
+msgid "Create a superuser account"
+msgstr "Crear cuenta de superadministrador"
+
+msgid "Enter the same password as before, for verification."
+msgstr "Ingrese la misma contraseña que antes, para verificación."
+
+msgid "Password"
+msgstr "Contraseña"
+
+msgid "Password (again)"
+msgstr "Contraseña (otra vez)"
+
+msgid "Username"
+msgstr "Usuario"
+
+msgid "Email address"
+msgstr "Correo electrónico"
+
+msgid "First name"
+msgstr "Nombre"
+
+msgid "Last name"
+msgstr "Apellido"
+
+msgid "This password is too short. It must contain at least %(min)d characters."
+msgstr "Esta contraseña es muy corta. Debe contener al menos %(min)d caracteres."
+
+msgid "This password is too common."
+msgstr "Esta contraseña es muy común."
+
+msgid "This password is entirely numeric."
+msgstr "Esta contraseña es completamente numérica."
+
+#: auth messages
+msgid "Your password was changed."
+msgstr "Su contraseña fue cambiada."
+
+msgid "Logged out"
+msgstr "Sesión cerrada"
+
+#: admin
+msgid "Username and password do not match. Please try again."
+msgstr "El nombre de usuario y contraseña no coinciden. Por favor intente de nuevo."
+
+msgid "Invalid login"
+msgstr "Inicio de sesión inválido"
