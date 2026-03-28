@@ -60,7 +60,7 @@ class UserCreateForm(forms.ModelForm):
     
     def clean_role(self):
         role = self.cleaned_data.get('role')
-        if role not in ['inquilino', 'sin_vinculo']:
+        if role not in ['admin', 'inquilino', 'sin_vinculo']:
             raise forms.ValidationError('Rol inválido.')
         return role
     
