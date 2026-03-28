@@ -11,6 +11,9 @@ from budget.forms import UserRegistrationForm, SpanishAuthenticationForm
 
 def register_view(request):
     """User registration view."""
+    if request.user.is_authenticated:
+        return redirect('budget:dashboard')
+    
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
@@ -25,6 +28,9 @@ def register_view(request):
 
 def login_view(request):
     """User login view."""
+    if request.user.is_authenticated:
+        return redirect('budget:dashboard')
+    
     if request.method == 'POST':
         form = SpanishAuthenticationForm(data=request.POST)
         if form.is_valid():
