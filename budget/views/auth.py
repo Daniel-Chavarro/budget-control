@@ -6,9 +6,11 @@ from django.contrib import messages
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.urls import reverse
 from django.views.decorators.http import require_POST
+from django.views.decorators.cache import never_cache
 from budget.forms import UserRegistrationForm, SpanishAuthenticationForm
 
 
+@never_cache
 def register_view(request):
     """User registration view."""
     if request.user.is_authenticated:
@@ -26,6 +28,7 @@ def register_view(request):
     return render(request, 'budget/auth/register.html', {'form': form})
 
 
+@never_cache
 def login_view(request):
     """User login view."""
     if request.user.is_authenticated:
