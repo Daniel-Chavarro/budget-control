@@ -435,6 +435,7 @@ body {
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    {% block navbar %}
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="{% url 'budget:dashboard' %}">
@@ -525,6 +526,7 @@ body {
             </div>
         </div>
     </nav>
+    {% endblock %}
     
     <main class="container">
         {% if messages %}
