@@ -46,7 +46,7 @@
                             {% with profile=u.userprofile %}
                                 {% if profile.is_admin %}
                                     <span class="badge bg-danger"><i class="bi bi-shield-check me-1"></i>Admin</span>
-                                {% elif profile.role == 'tenant' %}
+                                {% elif profile.role == 'inquilino' %}
                                     <span class="badge bg-primary"><i class="bi bi-house me-1"></i>Inquilino</span>
                                 {% else %}
                                     <span class="badge bg-secondary"><i class="bi bi-car-front me-1"></i>Sin Vínculo</span>
