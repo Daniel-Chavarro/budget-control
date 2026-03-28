@@ -211,8 +211,8 @@ __marimo__/
 .agent/
 .claude/
 skills-lock.json
-/secrets/
-
+.playwright-cli/
 
 # Test Data
 test_data/
+/secrets/
