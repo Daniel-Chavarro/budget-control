@@ -1,0 +1,81 @@
+{% extends "budget/base.html" %}
+
+{% block title %}Recibos - Control de Gastos{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-start">
+    <div>
+        <h1 class="page-title"><i class="bi bi-receipt me-2"></i>Recibos</h1>
+        <p class="page-subtitle">Ver y gestionar tus comprobantes</p>
+    </div>
+    <a href="{% url 'budget:receipt_upload' %}" class="btn btn-primary">
+        <i class="bi bi-upload me-1"></i>Subir Comprobante
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Nombre del Archivo</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th class="text-end">Monto</th>
+                        <th>Proveedor/Pagador</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for receipt in receipts %}
+                    <tr>
+                        <td>{{ receipt.upload_timestamp|date:"d M, Y" }}</td>
+                        <td>
+                            <i class="bi bi-file-earmark me-1 text-muted"></i>
+                            {{ receipt.file_name|truncatechars:25 }}
+                        </td>
+                        <td>
+{% if receipt.receipt_type == 'ingreso' %}
+                                <span class="badge bg-success">Ingreso</span>
+                            {% else %}
+                                <span class="badge bg-danger">Gasto</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if receipt.status == 'aprobado' %}
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Aprobado</span>
+                            {% elif receipt.status == 'rechazado' %}
+                                <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Rechazado</span>
+                            {% else %}
+                                <span class="badge bg-warning"><i class="bi bi-clock me-1"></i>Pendiente</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <strong class="{% if receipt.receipt_type == 'ingreso' %}text-success{% else %}text-danger{% endif %}">
+                                ${{ receipt.amount|default:'0.00' }}
+                            </strong>
+                        </td>
+                        <td>
+                            {{ receipt.counterparty|default:'-' }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <i class="bi bi-receipt"></i>
+                                <p class="mb-0">No has subido comprobantes aun</p>
+                                <a href="{% url 'budget:receipt_upload' %}" class="btn btn-primary btn-sm mt-2">
+                                    <i class="bi bi-upload me-1"></i>Subir Tu Primer Comprobante
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

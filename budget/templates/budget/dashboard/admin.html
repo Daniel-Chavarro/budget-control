@@ -1,0 +1,281 @@
+{% extends "budget/base.html" %}
+
+{% block title %}Panel de Administracion - Control de Gastos{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Panel de Administracion</h1>
+    <p class="page-subtitle">Resumen del sistema de control de gastos e ingresos</p>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background: var(--warning-light); color: var(--warning);">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <div class="ms-3">
+                        <div class="stat-value" style="color: var(--warning);">{{ pending_count }}</div>
+                        <div class="stat-label">Pendientes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background: var(--success-light); color: var(--success);">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <div class="ms-3">
+                        <div class="stat-value" style="color: var(--success);">{{ approved_count }}</div>
+                        <div class="stat-label">Aprobados</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background: var(--danger-light); color: var(--danger);">
+                        <i class="bi bi-x-circle"></i>
+                    </div>
+                    <div class="ms-3">
+                        <div class="stat-value" style="color: var(--danger);">{{ rejected_count }}</div>
+                        <div class="stat-label">Rechazados</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background: var(--info-light); color: var(--info);">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div class="ms-3">
+                        <div class="stat-value" style="color: var(--info);">{{ total_users }}</div>
+                        <div class="stat-label">Usuarios</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="stat-label">Gastos del Mes</div>
+                        <div class="stat-value" style="color: var(--danger);">${{ month_expenses|floatformat:2 }}</div>
+                    </div>
+                    <div class="stat-icon" style="background: var(--danger-light); color: var(--danger);">
+                        <i class="bi bi-arrow-down-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="stat-label">Ingresos del Mes</div>
+                        <div class="stat-value" style="color: var(--success);">${{ month_incomes|floatformat:2 }}</div>
+                    </div>
+                    <div class="stat-icon" style="background: var(--success-light); color: var(--success);">
+                        <i class="bi bi-arrow-up-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-8 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-hourglass-split me-2"></i>Recibos Pendientes</span>
+                <a href="{% url 'budget:pending_receipts' %}" class="btn btn-sm btn-outline-primary">
+                    Ver Todos <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Archivo</th>
+                                <th>Tipo</th>
+                                <th>Subido Por</th>
+                                <th>Monto</th>
+                                <th>Accion</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for receipt in pending_receipts %}
+                            <tr>
+                                <td>{{ receipt.upload_timestamp|date:"d M, Y" }}</td>
+                                <td>
+                                    <i class="bi bi-file-earmark me-1 text-muted"></i>
+                                    {{ receipt.file_name|truncatechars:20 }}
+                                </td>
+                                <td>
+                                    {% if receipt.receipt_type == 'ingreso' %}
+                                        <span class="badge bg-success">Ingreso</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Gasto</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <i class="bi bi-person me-1 text-muted"></i>
+                                    {{ receipt.uploaded_by.username }}
+                                </td>
+                                <td>
+                                    <strong class="{% if receipt.receipt_type == 'ingreso' %}text-success{% else %}text-danger{% endif %}">
+                                        ${{ receipt.amount|default:'0.00' }}
+                                    </strong>
+                                </td>
+                                <td>
+                                    <a href="{% url 'budget:receipt_detail' receipt.pk %}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-eye me-1"></i>Revisar
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <i class="bi bi-inbox"></i>
+                                        <p class="mb-0">No hay recibos pendientes</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="bi bi-pie-chart me-2"></i>Resumen por Categoria
+            </div>
+            <div class="card-body">
+                <h6 class="text-muted mb-2"><i class="bi bi-arrow-down me-1 text-danger"></i>Gastos</h6>
+                <div class="table-responsive mb-3">
+                    <table class="table table-sm table-hover mb-0">
+                        <tbody>
+                            {% for cat in expense_category_breakdown %}
+                            <tr>
+                                <td>{{ cat.category__name_es|default:cat.category__name|title }}</td>
+                                <td class="text-end"><strong>${{ cat.total|floatformat:2 }}</strong></td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2" class="text-muted text-center">Sin datos</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <h6 class="text-muted mb-2"><i class="bi bi-arrow-up me-1 text-success"></i>Ingresos</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0">
+                        <tbody>
+                            {% for cat in income_category_breakdown %}
+                            <tr>
+                                <td>{{ cat.category__name_es|default:cat.category__name|title }}</td>
+                                <td class="text-end"><strong class="text-success">${{ cat.total|floatformat:2 }}</strong></td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2" class="text-muted text-center">Sin datos</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-activity me-2"></i>Actividad Reciente
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Archivo</th>
+                        <th>Tipo</th>
+                        <th>Subido Por</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for receipt in recent_receipts %}
+                    <tr>
+                        <td>{{ receipt.upload_timestamp|date:"d M, Y H:i" }}</td>
+                        <td>
+                            <i class="bi bi-file-earmark me-1 text-muted"></i>
+                            {{ receipt.file_name|truncatechars:25 }}
+                        </td>
+                        <td>
+                            {% if receipt.receipt_type == 'ingreso' %}
+                                <span class="badge bg-success">Ingreso</span>
+                            {% else %}
+                                <span class="badge bg-danger">Gasto</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <i class="bi bi-person me-1 text-muted"></i>
+                            {{ receipt.uploaded_by.username }}
+                        </td>
+                        <td>
+                            {% if receipt.status == 'aprobado' %}
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Aprobado</span>
+                            {% elif receipt.status == 'rechazado' %}
+                                <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Rechazado</span>
+                            {% else %}
+                                <span class="badge bg-warning"><i class="bi bi-clock me-1"></i>Pendiente</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <i class="bi bi-inbox"></i>
+                                <p class="mb-0">No hay actividad aun</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

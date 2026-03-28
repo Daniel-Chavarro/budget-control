@@ -1,0 +1,83 @@
+{% extends "budget/base.html" %}
+
+{% block title %}Todos los Comprobantes - Control de Presupuesto{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><i class="bi bi-files me-2"></i>Todos los Comprobantes</h1>
+    <p class="page-subtitle">Ver todos los comprobantes en el sistema</p>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="btn-group" role="group">
+            <a href="?status=all" class="btn btn-sm {% if not selected_status or selected_status == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                <i class="bi bi-list me-1"></i>Todos
+            </a>
+            <a href="?status=pendiente" class="btn btn-sm {% if selected_status == 'pendiente' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+                <i class="bi bi-clock me-1"></i>Pendientes
+            </a>
+            <a href="?status=aprobado" class="btn btn-sm {% if selected_status == 'aprobado' %}btn-success{% else %}btn-outline-success{% endif %}">
+                <i class="bi bi-check-circle me-1"></i>Aprobados
+            </a>
+            <a href="?status=rechazado" class="btn btn-sm {% if selected_status == 'rechazado' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                <i class="bi bi-x-circle me-1"></i>Rechazados
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Archivo</th>
+                        <th>Subido por</th>
+                        <th>Estado</th>
+                        <th>Proveedor</th>
+                        <th class="text-end">Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for receipt in receipts %}
+                    <tr>
+                        <td>{{ receipt.upload_timestamp|date:"d M, Y" }}</td>
+                        <td>
+                            <i class="bi bi-file-earmark me-1 text-muted"></i>
+                            {{ receipt.file_name|truncatechars:25 }}
+                        </td>
+                        <td>
+                            <i class="bi bi-person me-1 text-muted"></i>
+                            {{ receipt.uploaded_by.username }}
+                        </td>
+                        <td>
+                            {% if receipt.status == 'aprobado' %}
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Aprobado</span>
+                            {% elif receipt.status == 'rechazado' %}
+                                <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Rechazado</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>Pendiente</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ receipt.expense_data.vendor|default:'-' }}</td>
+                        <td class="text-end"><strong>${{ receipt.expense_data.amount|default:'0.00' }}</strong></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <i class="bi bi-inbox"></i>
+                                <p class="mb-0">No se encontraron comprobantes</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

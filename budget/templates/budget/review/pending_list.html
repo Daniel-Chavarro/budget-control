@@ -1,0 +1,69 @@
+{% extends "budget/base.html" %}
+
+{% block title %}Recibos Pendientes - Control de Gastos{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><i class="bi bi-clock-history me-2"></i>Recibos Pendientes</h1>
+    <p class="page-subtitle">Revisar y aprobar recibos enviados</p>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Fecha de Upload</th>
+                        <th>Nombre del Archivo</th>
+                        <th>Tipo</th>
+                        <th>Subido Por</th>
+                        <th>Proveedor/Pagador</th>
+                        <th>Monto</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for receipt in pending_receipts %}
+                    <tr>
+                        <td>{{ receipt.upload_timestamp|date:"d M, Y H:i" }}</td>
+                        <td>
+                            <i class="bi bi-file-earmark me-1 text-muted"></i>
+                            {{ receipt.file_name|truncatechars:25 }}
+                        </td>
+                        <td>
+                            {% if receipt.receipt_type == 'ingreso' %}
+                                <span class="badge bg-success">Ingreso</span>
+                            {% else %}
+                                <span class="badge bg-danger">Gasto</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <i class="bi bi-person me-1 text-muted"></i>
+                            {{ receipt.uploaded_by.username }}
+                        </td>
+                        <td>{{ receipt.counterparty|default:'-' }}</td>
+                        <td><strong>${{ receipt.amount|default:'0.00' }}</strong></td>
+                        <td>
+                            <a href="{% url 'budget:receipt_detail' receipt.pk %}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-eye me-1"></i>Revisar
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <i class="bi bi-check-circle"></i>
+                                <p class="mb-0">No hay recibos pendientes</p>
+                                <span class="text-muted small">¡Todo al día!</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

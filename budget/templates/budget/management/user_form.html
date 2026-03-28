@@ -1,0 +1,189 @@
+{% extends "budget/base.html" %}
+
+{% block title %}Agregar Usuario - Control de Gastos{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><i class="bi bi-person-plus me-2"></i>Agregar Usuario</h1>
+    <p class="page-subtitle">Crear una cuenta para inquilino o usuario sin vínculo</p>
+</div>
+
+<div class="row">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-person-badge me-2"></i>Información del Usuario
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-medium">
+                            Rol del Usuario <span class="text-danger">*</span>
+                        </label>
+                        <div class="d-flex gap-4">
+                            {% for choice in form.role %}
+                                <div class="form-check">
+                                    {{ choice.tag }}
+                                    <label class="form-check-label" for="{{ choice.id_for_label }}">
+                                        {{ choice.choice_label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.role.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.role.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted d-block mt-2">
+                            Los inquilinos viven en el edificio. Los usuarios sin vínculo solo pagan estacionamiento.
+                        </small>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label fw-medium">
+                                Nombre de Usuario <span class="text-danger">*</span>
+                            </label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.username.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.password.id_for_label }}" class="form-label fw-medium">
+                                Contraseña <span class="text-danger">*</span>
+                            </label>
+                            {{ form.password }}
+                            {% if form.password.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.password.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.password_confirmation.id_for_label }}" class="form-label fw-medium">
+                                Confirmar Contraseña <span class="text-danger">*</span>
+                            </label>
+                            {{ form.password_confirmation }}
+                            {% if form.password_confirmation.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.password_confirmation.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label fw-medium">
+                            Correo Electrónico <span class="text-danger">*</span>
+                        </label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.email.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.first_name.id_for_label }}" class="form-label fw-medium">Nombre</label>
+                            {% if form.first_name.errors %}
+                                {{ form.first_name }}
+                            {% else %}
+                                {{ form.first_name }}
+                            {% endif %}
+                            {% if form.first_name.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.first_name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label fw-medium">Apellido</label>
+                            {% if form.last_name.errors %}
+                                {{ form.last_name }}
+                            {% else %}
+                                {{ form.last_name }}
+                            {% endif %}
+                            {% if form.last_name.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.last_name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>Crear Usuario
+                        </button>
+                        <a href="{% url 'budget:user_management' %}" class="btn btn-secondary">
+                            <i class="bi bi-x-lg me-1"></i>Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-5">
+        <div class="card" style="background: var(--gray-50);">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-info-circle me-2"></i>Información de Roles</h5>
+                
+                <div class="mt-3">
+                    <h6><i class="bi bi-house me-2 text-primary"></i>Inquilino</h6>
+                    <p class="text-muted small mb-0">
+                        Usuarios que viven en el edificio. Pueden subir recibos de gastos comunes y ver gastos aprobados.
+                    </p>
+                </div>
+                
+                <div class="mt-3">
+                    <h6><i class="bi bi-car-front me-2 text-secondary"></i>Sin Vínculo</h6>
+                    <p class="text-muted small mb-0">
+                        Usuarios que solo pagan por espacios de estacionamiento pero no viven en el edificio.
+                    </p>
+                </div>
+                
+                <div class="alert alert-warning mt-4 mb-0">
+                    <i class="bi bi-shield-exclamation me-1"></i>
+                    <strong>Nota:</strong> Los usuarios no pueden registrarse por su cuenta. Solo los administradores pueden crear cuentas por seguridad.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
